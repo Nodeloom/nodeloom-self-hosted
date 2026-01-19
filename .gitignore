@@ -1,0 +1,37 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Backups (keep backup scripts, ignore actual backups)
+backups/
+*.sql
+*.sql.gz
+
+# SSL certificates
+nginx/ssl/
+*.pem
+*.key
+*.crt
+
+# Kubernetes secrets with real values
+*-secrets-values.yaml
+my-values.yaml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/

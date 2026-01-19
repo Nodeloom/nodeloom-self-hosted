@@ -1,0 +1,147 @@
+# Default values for AgentHero
+# This is a YAML-formatted file.
+
+# Global settings
+global:
+  imageRegistry: ghcr.io/reedzerrad
+  imagePullSecrets: []
+
+# Backend configuration
+backend:
+  replicaCount: 2
+  image:
+    repository: agenthero-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "2"
+      memory: "4Gi"
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilization: 70
+    targetMemoryUtilization: 80
+
+# Frontend configuration
+frontend:
+  replicaCount: 2
+  image:
+    repository: agenthero-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  image: pgvector/pgvector:pg16
+  auth:
+    database: agenthero
+    username: agenthero
+    # Set via --set postgresql.auth.password=xxx
+    password: ""
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: ""  # Use default storage class
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "2"
+      memory: "4Gi"
+
+# Redis configuration
+redis:
+  enabled: true
+  image: redis:7-alpine
+  auth:
+    # Set via --set redis.auth.password=xxx
+    password: ""
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+  hosts:
+    - host: app.yourdomain.com
+      paths:
+        - path: /
+          service: frontend
+    - host: api.yourdomain.com
+      paths:
+        - path: /
+          service: backend
+  tls: []
+  #  - secretName: agenthero-tls
+  #    hosts:
+  #      - app.yourdomain.com
+  #      - api.yourdomain.com
+
+# Secrets - REQUIRED: Set these values!
+secrets:
+  # Generate with: openssl rand -base64 64
+  jwtSecret: ""
+  # AI Provider API keys (optional)
+  openaiApiKey: ""
+  anthropicApiKey: ""
+  googleAiApiKey: ""
+  azureOpenaiApiKey: ""
+  azureOpenaiEndpoint: ""
+  # OAuth credentials (optional)
+  googleClientId: ""
+  googleClientSecret: ""
+  githubClientId: ""
+  githubClientSecret: ""
+  slackClientId: ""
+  slackClientSecret: ""
+  # Stripe (optional)
+  stripeSecretKey: ""
+  stripeWebhookSecret: ""
+
+# Service account
+serviceAccount:
+  create: true
+  name: agenthero
+  annotations: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+
+# Container security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}

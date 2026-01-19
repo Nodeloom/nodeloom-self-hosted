@@ -1,0 +1,33 @@
+AgentHero Self-Hosted Deployment License
+
+Copyright 2026 AgentHero. All rights reserved.
+
+This deployment repository is provided exclusively to licensed AgentHero customers
+for the purpose of deploying AgentHero software on their own infrastructure.
+
+TERMS AND CONDITIONS:
+
+1. LICENSE GRANT
+   Subject to payment of applicable license fees and compliance with these terms,
+   you are granted a non-exclusive, non-transferable license to use these deployment
+   configurations to deploy AgentHero software.
+
+2. RESTRICTIONS
+   You may NOT:
+   - Redistribute this repository or its contents
+   - Use these configurations to deploy for third parties
+   - Remove or modify license notices
+   - Reverse engineer the AgentHero software
+
+3. SUPPORT
+   Support is provided according to your AgentHero subscription agreement.
+   Contact: support@agenthero.io
+
+4. WARRANTY DISCLAIMER
+   THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+
+5. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL AGENTHERO BE LIABLE FOR ANY DAMAGES ARISING FROM USE
+   OF THIS SOFTWARE.
+
+For full license terms, refer to your AgentHero subscription agreement.

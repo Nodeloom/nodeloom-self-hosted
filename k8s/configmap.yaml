@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agenthero-config
+  namespace: agenthero
+data:
+  # Database
+  POSTGRES_DB: "agenthero"
+  POSTGRES_USER: "agenthero"
+
+  # Spring settings
+  SPRING_PROFILES_ACTIVE: "production"
+  SERVER_PORT: "8080"
+
+  # Redis
+  SPRING_REDIS_HOST: "redis"
+  SPRING_REDIS_PORT: "6379"
+
+  # Application settings
+  AGENTHERO_SANDBOX_ENABLED: "false"

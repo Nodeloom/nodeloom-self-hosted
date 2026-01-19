@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "agenthero.fullname" . }}-frontend
+  name: {{ include "nodeloom.fullname" . }}-frontend
   labels:
-    {{- include "agenthero.labels" . | nindent 4 }}
+    {{- include "nodeloom.labels" . | nindent 4 }}
     app.kubernetes.io/component: frontend
 spec:
   replicas: {{ .Values.frontend.replicaCount }}
   selector:
     matchLabels:
-      {{- include "agenthero.selectorLabels" . | nindent 6 }}
+      {{- include "nodeloom.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: frontend
   template:
     metadata:
       labels:
-        {{- include "agenthero.selectorLabels" . | nindent 8 }}
+        {{- include "nodeloom.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: frontend
     spec:
       containers:
         - name: frontend
-          image: {{ include "agenthero.frontendImage" . }}
+          image: {{ include "nodeloom.frontendImage" . }}
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
           ports:
             - containerPort: 3000
               name: http
           env:
             - name: NEXT_PUBLIC_API_URL
-              value: http://{{ include "agenthero.fullname" . }}-backend:8080
+              value: http://{{ include "nodeloom.fullname" . }}-backend:8080
           resources:
             {{- toYaml .Values.frontend.resources | nindent 12 }}
           livenessProbe:

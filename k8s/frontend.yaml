@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   replicas: 2
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/reedzerrad/agenthero-frontend:latest
+          image: ghcr.io/reedzerrad/nodeloom-frontend:latest
           ports:
             - containerPort: 3000
           env:
@@ -45,7 +45,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   selector:
     app: frontend

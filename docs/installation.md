@@ -1,6 +1,6 @@
 # Installation Guide
 
-This guide covers the complete installation of AgentHero on your own infrastructure.
+This guide covers the complete installation of NodeLoom on your own infrastructure.
 
 ## Prerequisites
 
@@ -32,8 +32,8 @@ This guide covers the complete installation of AgentHero on your own infrastruct
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/reedzerrad/agenthero-self-hosted.git
-   cd agenthero-self-hosted
+   git clone https://github.com/reedzerrad/nodeloom-self-hosted.git
+   cd nodeloom-self-hosted
    ```
 
 2. **Create configuration:**
@@ -81,8 +81,8 @@ This guide covers the complete installation of AgentHero on your own infrastruct
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/reedzerrad/agenthero-self-hosted.git
-   cd agenthero-self-hosted
+   git clone https://github.com/reedzerrad/nodeloom-self-hosted.git
+   cd nodeloom-self-hosted
    ```
 
 2. **Create namespace:**
@@ -111,21 +111,21 @@ This guide covers the complete installation of AgentHero on your own infrastruct
 
 5. **Verify deployment:**
    ```bash
-   kubectl get pods -n agenthero
-   kubectl get svc -n agenthero
+   kubectl get pods -n nodeloom
+   kubectl get svc -n nodeloom
    ```
 
 ### Method 3: Helm Chart
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/reedzerrad/agenthero-self-hosted.git
-   cd agenthero-self-hosted
+   git clone https://github.com/reedzerrad/nodeloom-self-hosted.git
+   cd nodeloom-self-hosted
    ```
 
 2. **Create values override:**
    ```bash
-   cp helm/agenthero/values.yaml my-values.yaml
+   cp helm/nodeloom/values.yaml my-values.yaml
    ```
 
 3. **Edit configuration:**
@@ -156,16 +156,16 @@ This guide covers the complete installation of AgentHero on your own infrastruct
 
 4. **Install:**
    ```bash
-   helm install agenthero ./helm/agenthero \
-     --namespace agenthero \
+   helm install nodeloom ./helm/nodeloom \
+     --namespace nodeloom \
      --create-namespace \
      -f my-values.yaml
    ```
 
 5. **Verify:**
    ```bash
-   helm status agenthero -n agenthero
-   kubectl get pods -n agenthero
+   helm status nodeloom -n nodeloom
+   kubectl get pods -n nodeloom
    ```
 
 ## Post-Installation

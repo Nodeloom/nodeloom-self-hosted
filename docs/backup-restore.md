@@ -1,6 +1,6 @@
 # Backup & Restore Guide
 
-Protect your AgentHero data with regular backups.
+Protect your NodeLoom data with regular backups.
 
 ## What to Backup
 
@@ -17,10 +17,10 @@ Protect your AgentHero data with regular backups.
 **Manual backup:**
 ```bash
 # Create backup
-docker-compose exec postgres pg_dump -U agenthero agenthero > backup_$(date +%Y%m%d_%H%M%S).sql
+docker-compose exec postgres pg_dump -U nodeloom nodeloom > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Compressed backup
-docker-compose exec postgres pg_dump -U agenthero agenthero | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
+docker-compose exec postgres pg_dump -U nodeloom nodeloom | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
 ```
 
 **Automated backup script:**
@@ -36,22 +36,22 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 mkdir -p $BACKUP_DIR
 
 # Backup PostgreSQL
-docker-compose exec -T postgres pg_dump -U agenthero agenthero | gzip > $BACKUP_DIR/agenthero_$TIMESTAMP.sql.gz
+docker-compose exec -T postgres pg_dump -U nodeloom nodeloom | gzip > $BACKUP_DIR/nodeloom_$TIMESTAMP.sql.gz
 
 # Backup files volume
-docker run --rm -v agenthero-self-hosted_postgres_data:/data -v $BACKUP_DIR:/backup alpine tar czf /backup/files_$TIMESTAMP.tar.gz -C /data .
+docker run --rm -v nodeloom-self-hosted_postgres_data:/data -v $BACKUP_DIR:/backup alpine tar czf /backup/files_$TIMESTAMP.tar.gz -C /data .
 
 # Remove old backups
 find $BACKUP_DIR -name "*.sql.gz" -mtime +$RETENTION_DAYS -delete
 find $BACKUP_DIR -name "*.tar.gz" -mtime +$RETENTION_DAYS -delete
 
-echo "Backup completed: $BACKUP_DIR/agenthero_$TIMESTAMP.sql.gz"
+echo "Backup completed: $BACKUP_DIR/nodeloom_$TIMESTAMP.sql.gz"
 ```
 
 **Schedule with cron:**
 ```bash
 # Run daily at 2 AM
-0 2 * * * /path/to/scripts/backup.sh >> /var/log/agenthero-backup.log 2>&1
+0 2 * * * /path/to/scripts/backup.sh >> /var/log/nodeloom-backup.log 2>&1
 ```
 
 ### Database Restore
@@ -61,7 +61,7 @@ echo "Backup completed: $BACKUP_DIR/agenthero_$TIMESTAMP.sql.gz"
 docker-compose stop backend frontend
 
 # Restore from backup
-gunzip -c backup_20240101_120000.sql.gz | docker-compose exec -T postgres psql -U agenthero agenthero
+gunzip -c backup_20240101_120000.sql.gz | docker-compose exec -T postgres psql -U nodeloom nodeloom
 
 # Start the application
 docker-compose start backend frontend
@@ -74,10 +74,10 @@ docker-compose start backend frontend
 **Manual backup:**
 ```bash
 # Get PostgreSQL pod name
-PG_POD=$(kubectl get pods -n agenthero -l app=postgres -o jsonpath='{.items[0].metadata.name}')
+PG_POD=$(kubectl get pods -n nodeloom -l app=postgres -o jsonpath='{.items[0].metadata.name}')
 
 # Create backup
-kubectl exec -n agenthero $PG_POD -- pg_dump -U agenthero agenthero | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
+kubectl exec -n nodeloom $PG_POD -- pg_dump -U nodeloom nodeloom | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
 ```
 
 ### Using Velero (Recommended)
@@ -92,20 +92,20 @@ kubectl exec -n agenthero $PG_POD -- pg_dump -U agenthero agenthero | gzip > bac
 
 2. **Create backup:**
    ```bash
-   velero backup create agenthero-backup --include-namespaces agenthero
+   velero backup create nodeloom-backup --include-namespaces nodeloom
    ```
 
 3. **Schedule backups:**
    ```bash
-   velero schedule create agenthero-daily \
+   velero schedule create nodeloom-daily \
      --schedule="0 2 * * *" \
-     --include-namespaces agenthero \
+     --include-namespaces nodeloom \
      --ttl 720h
    ```
 
 4. **Restore:**
    ```bash
-   velero restore create --from-backup agenthero-backup
+   velero restore create --from-backup nodeloom-backup
    ```
 
 ### Using CronJob
@@ -116,7 +116,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: postgres-backup
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   schedule: "0 2 * * *"
   jobTemplate:
@@ -130,12 +130,12 @@ spec:
             - /bin/bash
             - -c
             - |
-              pg_dump -h postgres -U agenthero agenthero | gzip > /backup/agenthero_$(date +%Y%m%d).sql.gz
+              pg_dump -h postgres -U nodeloom nodeloom | gzip > /backup/nodeloom_$(date +%Y%m%d).sql.gz
             env:
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: POSTGRES_PASSWORD
             volumeMounts:
             - name: backup-volume
@@ -160,18 +160,18 @@ spec:
 
 2. **Wait for PostgreSQL to be ready:**
    ```bash
-   kubectl wait --for=condition=ready pod -l app=postgres -n agenthero --timeout=120s
+   kubectl wait --for=condition=ready pod -l app=postgres -n nodeloom --timeout=120s
    ```
 
 3. **Restore database:**
    ```bash
-   PG_POD=$(kubectl get pods -n agenthero -l app=postgres -o jsonpath='{.items[0].metadata.name}')
-   gunzip -c backup.sql.gz | kubectl exec -i -n agenthero $PG_POD -- psql -U agenthero agenthero
+   PG_POD=$(kubectl get pods -n nodeloom -l app=postgres -o jsonpath='{.items[0].metadata.name}')
+   gunzip -c backup.sql.gz | kubectl exec -i -n nodeloom $PG_POD -- psql -U nodeloom nodeloom
    ```
 
 4. **Verify application:**
    ```bash
-   kubectl get pods -n agenthero
+   kubectl get pods -n nodeloom
    curl https://api.yourdomain.com/actuator/health
    ```
 
@@ -184,10 +184,10 @@ spec:
 docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d
 
 # Restore backup to test environment
-gunzip -c backup.sql.gz | docker-compose exec -T postgres psql -U agenthero agenthero_test
+gunzip -c backup.sql.gz | docker-compose exec -T postgres psql -U nodeloom nodeloom_test
 
 # Verify data integrity
-docker-compose exec postgres psql -U agenthero agenthero_test -c "SELECT COUNT(*) FROM workflows;"
+docker-compose exec postgres psql -U nodeloom nodeloom_test -c "SELECT COUNT(*) FROM workflows;"
 ```
 
 ## Backup Checklist

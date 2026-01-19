@@ -1,6 +1,6 @@
-# AgentHero Self-Hosted
+# NodeLoom Self-Hosted
 
-Deploy AgentHero on your own infrastructure. This repository contains deployment configurations and documentation for running AgentHero in your own environment.
+Deploy NodeLoom on your own infrastructure. This repository contains deployment configurations and documentation for running NodeLoom in your own environment.
 
 ## Deployment Options
 
@@ -16,8 +16,8 @@ Deploy AgentHero on your own infrastructure. This repository contains deployment
 
 ```bash
 # Clone this repository
-git clone https://github.com/reedzerrad/agenthero-self-hosted.git
-cd agenthero-self-hosted
+git clone https://github.com/reedzerrad/nodeloom-self-hosted.git
+cd nodeloom-self-hosted
 
 # Copy and configure environment
 cp .env.example .env
@@ -26,7 +26,7 @@ cp .env.example .env
 # Start all services
 docker-compose up -d
 
-# Access AgentHero
+# Access NodeLoom
 open http://localhost:3000
 ```
 
@@ -43,19 +43,19 @@ kubectl apply -f k8s/secrets.yaml
 kubectl apply -f k8s/
 
 # Check status
-kubectl get pods -n agenthero
+kubectl get pods -n nodeloom
 ```
 
 ### Helm
 
 ```bash
 # Add values override
-cp helm/agenthero/values.yaml my-values.yaml
+cp helm/nodeloom/values.yaml my-values.yaml
 # Edit my-values.yaml with your configuration
 
 # Install
-helm install agenthero ./helm/agenthero \
-  --namespace agenthero \
+helm install nodeloom ./helm/nodeloom \
+  --namespace nodeloom \
   --create-namespace \
   -f my-values.yaml
 ```
@@ -93,8 +93,8 @@ helm install agenthero ./helm/agenthero \
 Official images are published to GitHub Container Registry:
 
 ```
-ghcr.io/reedzerrad/agenthero-backend:latest
-ghcr.io/reedzerrad/agenthero-frontend:latest
+ghcr.io/reedzerrad/nodeloom-backend:latest
+ghcr.io/reedzerrad/nodeloom-frontend:latest
 ```
 
 ### Available Tags
@@ -104,13 +104,13 @@ ghcr.io/reedzerrad/agenthero-frontend:latest
 
 ## Support
 
-- **Documentation**: https://docs.agenthero.io
-- **Issues**: https://github.com/reedzerrad/agenthero-self-hosted/issues
-- **Email**: support@agenthero.io
+- **Documentation**: https://docs.nodeloom.io
+- **Issues**: https://github.com/reedzerrad/nodeloom-self-hosted/issues
+- **Email**: support@nodeloom.io
 
 ## License
 
-This deployment repository is provided for licensed AgentHero customers only.
+This deployment repository is provided for licensed NodeLoom customers only.
 See [LICENSE](LICENSE) for terms.
 
-Copyright 2026 AgentHero. All rights reserved.
+Copyright 2026 NodeLoom. All rights reserved.

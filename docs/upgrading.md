@@ -1,6 +1,6 @@
 # Upgrading Guide
 
-How to upgrade AgentHero to a new version.
+How to upgrade NodeLoom to a new version.
 
 ## Before Upgrading
 
@@ -23,7 +23,7 @@ How to upgrade AgentHero to a new version.
 
 ```bash
 # 1. Backup database
-docker-compose exec postgres pg_dump -U agenthero agenthero > backup_before_upgrade.sql
+docker-compose exec postgres pg_dump -U nodeloom nodeloom > backup_before_upgrade.sql
 
 # 2. Pull new images
 docker-compose pull
@@ -59,7 +59,7 @@ docker-compose down
 # Edit .env: AGENTHERO_VERSION=1.1.0
 
 # 3. Restore database
-cat backup_before_upgrade.sql | docker-compose exec -T postgres psql -U agenthero agenthero
+cat backup_before_upgrade.sql | docker-compose exec -T postgres psql -U nodeloom nodeloom
 
 # 4. Start with old version
 docker-compose up -d
@@ -71,22 +71,22 @@ docker-compose up -d
 
 ```bash
 # 1. Backup
-PG_POD=$(kubectl get pods -n agenthero -l app=postgres -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -n agenthero $PG_POD -- pg_dump -U agenthero agenthero > backup.sql
+PG_POD=$(kubectl get pods -n nodeloom -l app=postgres -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n nodeloom $PG_POD -- pg_dump -U nodeloom nodeloom > backup.sql
 
 # 2. Update image tags in manifests
-sed -i 's/agenthero-backend:1.1.0/agenthero-backend:1.2.0/g' k8s/backend.yaml
-sed -i 's/agenthero-frontend:1.1.0/agenthero-frontend:1.2.0/g' k8s/frontend.yaml
+sed -i 's/nodeloom-backend:1.1.0/nodeloom-backend:1.2.0/g' k8s/backend.yaml
+sed -i 's/nodeloom-frontend:1.1.0/nodeloom-frontend:1.2.0/g' k8s/frontend.yaml
 
 # 3. Apply updates
 kubectl apply -f k8s/backend.yaml
 kubectl apply -f k8s/frontend.yaml
 
 # 4. Watch rollout
-kubectl rollout status deployment/backend -n agenthero
+kubectl rollout status deployment/backend -n nodeloom
 
 # 5. Verify
-kubectl get pods -n agenthero
+kubectl get pods -n nodeloom
 ```
 
 ### Using Helm
@@ -105,33 +105,33 @@ kubectl get pods -n agenthero
 #     tag: "1.2.0"
 
 # 3. Upgrade
-helm upgrade agenthero ./helm/agenthero \
-  --namespace agenthero \
+helm upgrade nodeloom ./helm/nodeloom \
+  --namespace nodeloom \
   -f my-values.yaml
 
 # 4. Watch rollout
-kubectl rollout status deployment/agenthero-backend -n agenthero
+kubectl rollout status deployment/nodeloom-backend -n nodeloom
 
 # 5. Verify
-helm status agenthero -n agenthero
+helm status nodeloom -n nodeloom
 ```
 
 ### Rollback with Helm
 
 ```bash
 # List history
-helm history agenthero -n agenthero
+helm history nodeloom -n nodeloom
 
 # Rollback to previous release
-helm rollback agenthero 1 -n agenthero
+helm rollback nodeloom 1 -n nodeloom
 
 # Restore database if needed
-cat backup.sql | kubectl exec -i -n agenthero $PG_POD -- psql -U agenthero agenthero
+cat backup.sql | kubectl exec -i -n nodeloom $PG_POD -- psql -U nodeloom nodeloom
 ```
 
 ## Database Migrations
 
-AgentHero uses Flyway for database migrations. Migrations run automatically on startup.
+NodeLoom uses Flyway for database migrations. Migrations run automatically on startup.
 
 ### Check Migration Status
 
@@ -140,14 +140,14 @@ AgentHero uses Flyway for database migrations. Migrations run automatically on s
 docker-compose logs backend | grep -i flyway
 
 # Kubernetes
-kubectl logs -n agenthero deployment/backend | grep -i flyway
+kubectl logs -n nodeloom deployment/backend | grep -i flyway
 ```
 
 ### Manual Migration (if needed)
 
 ```bash
 # Connect to database
-docker-compose exec postgres psql -U agenthero agenthero
+docker-compose exec postgres psql -U nodeloom nodeloom
 
 # Check migration history
 SELECT * FROM flyway_schema_history ORDER BY installed_rank DESC LIMIT 10;
@@ -186,7 +186,7 @@ docker-compose logs backend | grep -i error
 
 # If migration failed, restore backup
 docker-compose down
-cat backup_before_upgrade.sql | docker-compose exec -T postgres psql -U agenthero agenthero
+cat backup_before_upgrade.sql | docker-compose exec -T postgres psql -U nodeloom nodeloom
 docker-compose up -d
 ```
 
@@ -209,8 +209,8 @@ docker-compose logs backend
 docker stats
 
 # Kubernetes
-kubectl top pods -n agenthero
+kubectl top pods -n nodeloom
 
 # May need to run VACUUM ANALYZE after major upgrade
-docker-compose exec postgres psql -U agenthero agenthero -c "VACUUM ANALYZE;"
+docker-compose exec postgres psql -U nodeloom nodeloom -c "VACUUM ANALYZE;"
 ```

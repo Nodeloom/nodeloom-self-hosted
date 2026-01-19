@@ -1,6 +1,6 @@
 # Security Guide
 
-Security best practices and hardening for AgentHero self-hosted deployments.
+Security best practices and hardening for NodeLoom self-hosted deployments.
 
 ## Security Checklist
 
@@ -39,21 +39,21 @@ Use external secrets manager:
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: agenthero-secrets
-  namespace: agenthero
+  name: nodeloom-secrets
+  namespace: nodeloom
 spec:
   secretStoreRef:
     name: vault-backend
     kind: ClusterSecretStore
   target:
-    name: agenthero-secrets
+    name: nodeloom-secrets
   data:
     - secretKey: JWT_SECRET
       remoteRef:
-        key: agenthero/jwt-secret
+        key: nodeloom/jwt-secret
     - secretKey: POSTGRES_PASSWORD
       remoteRef:
-        key: agenthero/postgres-password
+        key: nodeloom/postgres-password
 ```
 
 ## TLS/HTTPS Configuration
@@ -154,7 +154,7 @@ spec:
        - hosts:
            - app.yourdomain.com
            - api.yourdomain.com
-         secretName: agenthero-tls
+         secretName: nodeloom-tls
    ```
 
 ## Network Security
@@ -170,13 +170,13 @@ services:
     # ports:
     #   - "5432:5432"
     networks:
-      - agenthero-network
+      - nodeloom-network
 
   backend:
     ports:
       - "127.0.0.1:8080:8080"  # Localhost only
     networks:
-      - agenthero-network
+      - nodeloom-network
 ```
 
 ### Kubernetes Network Policies
@@ -186,7 +186,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: backend-policy
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   podSelector:
     matchLabels:
@@ -247,7 +247,7 @@ spec:
 
 ### RBAC
 
-AgentHero includes built-in RBAC with these roles:
+NodeLoom includes built-in RBAC with these roles:
 - **Admin** - Full access
 - **Builder** - Create/edit workflows
 - **Operator** - Execute workflows
@@ -319,11 +319,11 @@ resources:
    docker-compose up -d
 
    # Helm
-   helm upgrade agenthero ./helm/agenthero -n agenthero
+   helm upgrade nodeloom ./helm/nodeloom -n nodeloom
    ```
 3. **Monitor for vulnerabilities:**
    ```bash
-   docker scan ghcr.io/reedzerrad/agenthero-backend:latest
+   docker scan ghcr.io/reedzerrad/nodeloom-backend:latest
    ```
 
 ## Incident Response
@@ -332,4 +332,4 @@ resources:
 2. **Preserve logs for analysis**
 3. **Rotate all secrets**
 4. **Review audit logs**
-5. **Contact support@agenthero.io**
+5. **Contact support@nodeloom.io**

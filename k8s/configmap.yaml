@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: agenthero-config
-  namespace: agenthero
+  name: nodeloom-config
+  namespace: nodeloom
 data:
   # Database
-  POSTGRES_DB: "agenthero"
-  POSTGRES_USER: "agenthero"
+  POSTGRES_DB: "nodeloom"
+  POSTGRES_USER: "nodeloom"
 
   # Spring settings
   SPRING_PROFILES_ACTIVE: "production"

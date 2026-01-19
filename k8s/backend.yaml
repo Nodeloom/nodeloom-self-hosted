@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   replicas: 2
   selector:
@@ -13,90 +13,90 @@ spec:
       labels:
         app: backend
     spec:
-      serviceAccountName: agenthero
+      serviceAccountName: nodeloom
       containers:
         - name: backend
-          image: ghcr.io/reedzerrad/agenthero-backend:latest
+          image: ghcr.io/reedzerrad/nodeloom-backend:latest
           ports:
             - containerPort: 8080
           env:
             # Database
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres:5432/agenthero
+              value: jdbc:postgresql://postgres:5432/nodeloom
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 configMapKeyRef:
-                  name: agenthero-config
+                  name: nodeloom-config
                   key: POSTGRES_USER
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: POSTGRES_PASSWORD
             # Redis
             - name: SPRING_REDIS_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: agenthero-config
+                  name: nodeloom-config
                   key: SPRING_REDIS_HOST
             - name: SPRING_REDIS_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: agenthero-config
+                  name: nodeloom-config
                   key: SPRING_REDIS_PORT
             - name: SPRING_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: REDIS_PASSWORD
             # Security
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: JWT_SECRET
             # AI Providers
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: OPENAI_API_KEY
             - name: ANTHROPIC_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: ANTHROPIC_API_KEY
             - name: GOOGLE_AI_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: GOOGLE_AI_API_KEY
             # OAuth
             - name: GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: GOOGLE_CLIENT_ID
             - name: GOOGLE_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: GOOGLE_CLIENT_SECRET
             - name: GITHUB_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: GITHUB_CLIENT_ID
             - name: GITHUB_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: GITHUB_CLIENT_SECRET
             # Spring
             - name: SPRING_PROFILES_ACTIVE
               valueFrom:
                 configMapKeyRef:
-                  name: agenthero-config
+                  name: nodeloom-config
                   key: SPRING_PROFILES_ACTIVE
             - name: SERVER_PORT
               value: "8080"
@@ -126,7 +126,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   selector:
     app: backend
@@ -138,7 +138,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: backend-hpa
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -163,5 +163,5 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: agenthero
-  namespace: agenthero
+  name: nodeloom
+  namespace: nodeloom

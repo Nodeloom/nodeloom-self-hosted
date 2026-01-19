@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: agenthero-ingress
-  namespace: agenthero
+  name: nodeloom-ingress
+  namespace: nodeloom
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
@@ -19,7 +19,7 @@ spec:
   #   - hosts:
   #       - app.yourdomain.com
   #       - api.yourdomain.com
-  #     secretName: agenthero-tls
+  #     secretName: nodeloom-tls
   rules:
     # Frontend
     - host: app.yourdomain.com  # Change to your domain

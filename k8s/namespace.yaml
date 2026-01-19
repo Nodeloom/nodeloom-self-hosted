@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: agenthero
+  name: nodeloom
   labels:
-    app.kubernetes.io/name: agenthero
-    app.kubernetes.io/part-of: agenthero
+    app.kubernetes.io/name: nodeloom
+    app.kubernetes.io/part-of: nodeloom

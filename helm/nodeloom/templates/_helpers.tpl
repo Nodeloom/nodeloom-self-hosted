@@ -1,14 +1,14 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "agenthero.name" -}}
+{{- define "nodeloom.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "agenthero.fullname" -}}
+{{- define "nodeloom.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -24,16 +24,16 @@ Create a default fully qualified app name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "agenthero.chart" -}}
+{{- define "nodeloom.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "agenthero.labels" -}}
-helm.sh/chart: {{ include "agenthero.chart" . }}
-{{ include "agenthero.selectorLabels" . }}
+{{- define "nodeloom.labels" -}}
+helm.sh/chart: {{ include "nodeloom.chart" . }}
+{{ include "nodeloom.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -43,31 +43,31 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "agenthero.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "agenthero.name" . }}
+{{- define "nodeloom.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "nodeloom.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Backend image
 */}}
-{{- define "agenthero.backendImage" -}}
+{{- define "nodeloom.backendImage" -}}
 {{ .Values.global.imageRegistry }}/{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
 {{- end }}
 
 {{/*
 Frontend image
 */}}
-{{- define "agenthero.frontendImage" -}}
+{{- define "nodeloom.frontendImage" -}}
 {{ .Values.global.imageRegistry }}/{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
 {{- end }}
 
 {{/*
 Service account name
 */}}
-{{- define "agenthero.serviceAccountName" -}}
+{{- define "nodeloom.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "agenthero.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "nodeloom.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

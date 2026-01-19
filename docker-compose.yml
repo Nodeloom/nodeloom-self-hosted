@@ -3,27 +3,27 @@ version: "3.8"
 services:
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: agenthero-postgres
+    container_name: nodeloom-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-agenthero}
-      POSTGRES_USER: ${POSTGRES_USER:-agenthero}
+      POSTGRES_DB: ${POSTGRES_DB:-nodeloom}
+      POSTGRES_USER: ${POSTGRES_USER:-nodeloom}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agenthero}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nodeloom}"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - agenthero-network
+      - nodeloom-network
 
   redis:
     image: redis:7-alpine
-    container_name: agenthero-redis
+    container_name: nodeloom-redis
     restart: unless-stopped
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
@@ -36,11 +36,11 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - agenthero-network
+      - nodeloom-network
 
   backend:
-    image: ghcr.io/reedzerrad/agenthero-backend:${AGENTHERO_VERSION:-latest}
-    container_name: agenthero-backend
+    image: ghcr.io/reedzerrad/nodeloom-backend:${AGENTHERO_VERSION:-latest}
+    container_name: nodeloom-backend
     restart: unless-stopped
     depends_on:
       postgres:
@@ -49,8 +49,8 @@ services:
         condition: service_healthy
     environment:
       # Database
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-agenthero}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-agenthero}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-nodeloom}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-nodeloom}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
 
       # Redis
@@ -91,7 +91,7 @@ services:
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     volumes:
-      - ./data/files:/tmp/agenthero-files
+      - ./data/files:/tmp/nodeloom-files
       - /var/run/docker.sock:/var/run/docker.sock:ro  # For sandbox execution
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
@@ -100,11 +100,11 @@ services:
       retries: 3
       start_period: 60s
     networks:
-      - agenthero-network
+      - nodeloom-network
 
   frontend:
-    image: ghcr.io/reedzerrad/agenthero-frontend:${AGENTHERO_VERSION:-latest}
-    container_name: agenthero-frontend
+    image: ghcr.io/reedzerrad/nodeloom-frontend:${AGENTHERO_VERSION:-latest}
+    container_name: nodeloom-frontend
     restart: unless-stopped
     depends_on:
       - backend
@@ -118,12 +118,12 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - agenthero-network
+      - nodeloom-network
 
   # Optional: Nginx reverse proxy with SSL
   nginx:
     image: nginx:alpine
-    container_name: agenthero-nginx
+    container_name: nodeloom-nginx
     restart: unless-stopped
     profiles:
       - with-nginx
@@ -138,7 +138,7 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
     networks:
-      - agenthero-network
+      - nodeloom-network
 
 volumes:
   postgres_data:
@@ -147,5 +147,5 @@ volumes:
     driver: local
 
 networks:
-  agenthero-network:
+  nodeloom-network:
     driver: bridge

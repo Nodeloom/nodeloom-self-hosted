@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "agenthero.fullname" . }}-redis
+  name: {{ include "nodeloom.fullname" . }}-redis
   labels:
-    {{- include "agenthero.labels" . | nindent 4 }}
+    {{- include "nodeloom.labels" . | nindent 4 }}
     app.kubernetes.io/component: redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "agenthero.selectorLabels" . | nindent 6 }}
+      {{- include "nodeloom.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: redis
   template:
     metadata:
       labels:
-        {{- include "agenthero.selectorLabels" . | nindent 8 }}
+        {{- include "nodeloom.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: redis
     spec:
       containers:
@@ -33,7 +33,7 @@ spec:
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "agenthero.fullname" . }}-secrets
+                  name: {{ include "nodeloom.fullname" . }}-secrets
                   key: REDIS_PASSWORD
           resources:
             {{- toYaml .Values.redis.resources | nindent 12 }}

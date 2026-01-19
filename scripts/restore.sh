@@ -1,5 +1,5 @@
 #!/bin/bash
-# AgentHero Database Restore Script
+# NodeLoom Database Restore Script
 # Usage: ./scripts/restore.sh <backup_file>
 
 set -e
@@ -27,7 +27,7 @@ if [ -z "$1" ]; then
     log_error "Usage: ./scripts/restore.sh <backup_file>"
     echo ""
     echo "Available backups:"
-    ls -lh ./backups/agenthero_*.sql.gz 2>/dev/null || echo "  No backups found in ./backups/"
+    ls -lh ./backups/nodeloom_*.sql.gz 2>/dev/null || echo "  No backups found in ./backups/"
     exit 1
 fi
 
@@ -52,7 +52,7 @@ fi
 # Detect deployment type
 if command -v docker-compose &> /dev/null && docker-compose ps &> /dev/null; then
     DEPLOYMENT_TYPE="docker-compose"
-elif command -v kubectl &> /dev/null && kubectl get namespace agenthero &> /dev/null 2>&1; then
+elif command -v kubectl &> /dev/null && kubectl get namespace nodeloom &> /dev/null 2>&1; then
     DEPLOYMENT_TYPE="kubernetes"
 else
     log_error "Could not detect deployment type. Ensure docker-compose or kubectl is configured."
@@ -69,14 +69,14 @@ mkdir -p ./backups
 log_info "Creating safety backup before restore..."
 
 if [ "$DEPLOYMENT_TYPE" == "docker-compose" ]; then
-    docker-compose exec -T postgres pg_dump -U agenthero agenthero | gzip > "$SAFETY_BACKUP"
+    docker-compose exec -T postgres pg_dump -U nodeloom nodeloom | gzip > "$SAFETY_BACKUP"
     log_info "Safety backup created: $SAFETY_BACKUP"
 
     log_info "Stopping application services..."
     docker-compose stop backend frontend
 
     log_info "Restoring database..."
-    gunzip -c "$BACKUP_FILE" | docker-compose exec -T postgres psql -U agenthero agenthero
+    gunzip -c "$BACKUP_FILE" | docker-compose exec -T postgres psql -U nodeloom nodeloom
 
     if [ $? -eq 0 ]; then
         log_info "Database restored successfully!"
@@ -90,25 +90,25 @@ if [ "$DEPLOYMENT_TYPE" == "docker-compose" ]; then
     docker-compose start backend frontend
 
 elif [ "$DEPLOYMENT_TYPE" == "kubernetes" ]; then
-    PG_POD=$(kubectl get pods -n agenthero -l app=postgres -o jsonpath='{.items[0].metadata.name}')
+    PG_POD=$(kubectl get pods -n nodeloom -l app=postgres -o jsonpath='{.items[0].metadata.name}')
 
     if [ -z "$PG_POD" ]; then
         log_error "Could not find PostgreSQL pod"
         exit 1
     fi
 
-    kubectl exec -n agenthero "$PG_POD" -- pg_dump -U agenthero agenthero | gzip > "$SAFETY_BACKUP"
+    kubectl exec -n nodeloom "$PG_POD" -- pg_dump -U nodeloom nodeloom | gzip > "$SAFETY_BACKUP"
     log_info "Safety backup created: $SAFETY_BACKUP"
 
     log_info "Scaling down application..."
-    kubectl scale deployment backend -n agenthero --replicas=0
-    kubectl scale deployment frontend -n agenthero --replicas=0
+    kubectl scale deployment backend -n nodeloom --replicas=0
+    kubectl scale deployment frontend -n nodeloom --replicas=0
 
     log_info "Waiting for pods to terminate..."
     sleep 10
 
     log_info "Restoring database..."
-    gunzip -c "$BACKUP_FILE" | kubectl exec -i -n agenthero "$PG_POD" -- psql -U agenthero agenthero
+    gunzip -c "$BACKUP_FILE" | kubectl exec -i -n nodeloom "$PG_POD" -- psql -U nodeloom nodeloom
 
     if [ $? -eq 0 ]; then
         log_info "Database restored successfully!"
@@ -119,11 +119,11 @@ elif [ "$DEPLOYMENT_TYPE" == "kubernetes" ]; then
     fi
 
     log_info "Scaling up application..."
-    kubectl scale deployment backend -n agenthero --replicas=2
-    kubectl scale deployment frontend -n agenthero --replicas=2
+    kubectl scale deployment backend -n nodeloom --replicas=2
+    kubectl scale deployment frontend -n nodeloom --replicas=2
 
     log_info "Waiting for pods to be ready..."
-    kubectl wait --for=condition=ready pod -l app.kubernetes.io/component=backend -n agenthero --timeout=120s
+    kubectl wait --for=condition=ready pod -l app.kubernetes.io/component=backend -n nodeloom --timeout=120s
 fi
 
 log_info "Restore completed successfully!"
@@ -132,5 +132,5 @@ echo "Verify the application is working:"
 if [ "$DEPLOYMENT_TYPE" == "docker-compose" ]; then
     echo "  curl http://localhost:8080/actuator/health"
 else
-    echo "  kubectl get pods -n agenthero"
+    echo "  kubectl get pods -n nodeloom"
 fi

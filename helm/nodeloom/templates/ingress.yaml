@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "agenthero.fullname" . }}
+  name: {{ include "nodeloom.fullname" . }}
   labels:
-    {{- include "agenthero.labels" . | nindent 4 }}
+    {{- include "nodeloom.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -34,11 +34,11 @@ spec:
             backend:
               service:
                 {{- if eq .service "backend" }}
-                name: {{ include "agenthero.fullname" $ }}-backend
+                name: {{ include "nodeloom.fullname" $ }}-backend
                 port:
                   number: 8080
                 {{- else }}
-                name: {{ include "agenthero.fullname" $ }}-frontend
+                name: {{ include "nodeloom.fullname" $ }}-frontend
                 port:
                   number: 3000
                 {{- end }}

@@ -1,6 +1,6 @@
 # Configuration Reference
 
-Complete reference for all AgentHero configuration options.
+Complete reference for all NodeLoom configuration options.
 
 ## Environment Variables
 
@@ -16,8 +16,8 @@ Complete reference for all AgentHero configuration options.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `POSTGRES_DB` | `agenthero` | Database name |
-| `POSTGRES_USER` | `agenthero` | Database user |
+| `POSTGRES_DB` | `nodeloom` | Database name |
+| `POSTGRES_USER` | `nodeloom` | Database user |
 | `POSTGRES_PASSWORD` | - | Database password (required) |
 | `POSTGRES_PORT` | `5432` | PostgreSQL port |
 
@@ -152,7 +152,7 @@ ingress:
         - path: /
           service: backend
   tls:
-    - secretName: agenthero-tls
+    - secretName: nodeloom-tls
       hosts:
         - app.yourdomain.com
         - api.yourdomain.com

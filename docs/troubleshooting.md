@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-Common issues and solutions for AgentHero self-hosted deployments.
+Common issues and solutions for NodeLoom self-hosted deployments.
 
 ## Quick Diagnostics
 
@@ -26,17 +26,17 @@ docker stats
 
 ```bash
 # Check pod status
-kubectl get pods -n agenthero
+kubectl get pods -n nodeloom
 
 # Check pod events
-kubectl describe pod <pod-name> -n agenthero
+kubectl describe pod <pod-name> -n nodeloom
 
 # Check logs
-kubectl logs -n agenthero deployment/backend
-kubectl logs -n agenthero deployment/frontend
+kubectl logs -n nodeloom deployment/backend
+kubectl logs -n nodeloom deployment/frontend
 
 # Check resource usage
-kubectl top pods -n agenthero
+kubectl top pods -n nodeloom
 ```
 
 ## Common Issues
@@ -65,7 +65,7 @@ docker-compose logs backend | tail -100
 
 **Test connection:**
 ```bash
-docker-compose exec postgres psql -U agenthero -d agenthero -c "SELECT 1;"
+docker-compose exec postgres psql -U nodeloom -d nodeloom -c "SELECT 1;"
 ```
 
 **Check PostgreSQL logs:**
@@ -119,10 +119,10 @@ docker-compose logs backend | grep -i "auth\|jwt\|token"
 **Database:**
 ```bash
 # Run VACUUM ANALYZE
-docker-compose exec postgres psql -U agenthero agenthero -c "VACUUM ANALYZE;"
+docker-compose exec postgres psql -U nodeloom nodeloom -c "VACUUM ANALYZE;"
 
 # Check slow queries
-docker-compose exec postgres psql -U agenthero agenthero -c "
+docker-compose exec postgres psql -U nodeloom nodeloom -c "
   SELECT query, calls, mean_time
   FROM pg_stat_statements
   ORDER BY mean_time DESC
@@ -186,8 +186,8 @@ docker system df
 docker system prune -a  # Clean unused images
 
 # PostgreSQL
-docker-compose exec postgres psql -U agenthero agenthero -c "
-  SELECT pg_size_pretty(pg_database_size('agenthero'));
+docker-compose exec postgres psql -U nodeloom nodeloom -c "
+  SELECT pg_size_pretty(pg_database_size('nodeloom'));
 "
 ```
 
@@ -200,8 +200,8 @@ openssl s_client -connect yourdomain.com:443 -servername yourdomain.com
 
 **cert-manager issues:**
 ```bash
-kubectl describe certificate -n agenthero
-kubectl describe certificaterequest -n agenthero
+kubectl describe certificate -n nodeloom
+kubectl describe certificaterequest -n nodeloom
 ```
 
 ## Health Checks
@@ -220,7 +220,7 @@ Expected response:
 ### Database Health
 
 ```bash
-docker-compose exec postgres pg_isready -U agenthero
+docker-compose exec postgres pg_isready -U nodeloom
 ```
 
 ### Redis Health
@@ -232,9 +232,9 @@ docker-compose exec redis redis-cli -a $REDIS_PASSWORD ping
 ## Getting Help
 
 1. **Check logs** - Most issues are visible in logs
-2. **Search existing issues** - https://github.com/reedzerrad/agenthero-self-hosted/issues
+2. **Search existing issues** - https://github.com/reedzerrad/nodeloom-self-hosted/issues
 3. **Create new issue** - Include logs and configuration (redact secrets)
-4. **Contact support** - support@agenthero.io
+4. **Contact support** - support@nodeloom.io
 
 ## Useful Commands Reference
 
@@ -258,5 +258,5 @@ docker-compose exec backend bash
 docker stats --no-stream
 
 # Kubernetes: Force pod restart
-kubectl rollout restart deployment/backend -n agenthero
+kubectl rollout restart deployment/backend -n nodeloom
 ```

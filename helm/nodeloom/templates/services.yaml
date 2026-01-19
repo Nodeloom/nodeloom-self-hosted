@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "agenthero.fullname" . }}-backend
+  name: {{ include "nodeloom.fullname" . }}-backend
   labels:
-    {{- include "agenthero.labels" . | nindent 4 }}
+    {{- include "nodeloom.labels" . | nindent 4 }}
     app.kubernetes.io/component: backend
 spec:
   selector:
-    {{- include "agenthero.selectorLabels" . | nindent 4 }}
+    {{- include "nodeloom.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: backend
   ports:
     - port: 8080
@@ -17,13 +17,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "agenthero.fullname" . }}-frontend
+  name: {{ include "nodeloom.fullname" . }}-frontend
   labels:
-    {{- include "agenthero.labels" . | nindent 4 }}
+    {{- include "nodeloom.labels" . | nindent 4 }}
     app.kubernetes.io/component: frontend
 spec:
   selector:
-    {{- include "agenthero.selectorLabels" . | nindent 4 }}
+    {{- include "nodeloom.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: frontend
   ports:
     - port: 3000
@@ -34,13 +34,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "agenthero.fullname" . }}-postgres
+  name: {{ include "nodeloom.fullname" . }}-postgres
   labels:
-    {{- include "agenthero.labels" . | nindent 4 }}
+    {{- include "nodeloom.labels" . | nindent 4 }}
     app.kubernetes.io/component: postgres
 spec:
   selector:
-    {{- include "agenthero.selectorLabels" . | nindent 4 }}
+    {{- include "nodeloom.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: postgres
   ports:
     - port: 5432
@@ -52,13 +52,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "agenthero.fullname" . }}-redis
+  name: {{ include "nodeloom.fullname" . }}-redis
   labels:
-    {{- include "agenthero.labels" . | nindent 4 }}
+    {{- include "nodeloom.labels" . | nindent 4 }}
     app.kubernetes.io/component: redis
 spec:
   selector:
-    {{- include "agenthero.selectorLabels" . | nindent 4 }}
+    {{- include "nodeloom.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: redis
   ports:
     - port: 6379

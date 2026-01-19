@@ -1,4 +1,4 @@
-# Default values for AgentHero
+# Default values for NodeLoom
 # This is a YAML-formatted file.
 
 # Global settings
@@ -10,7 +10,7 @@ global:
 backend:
   replicaCount: 2
   image:
-    repository: agenthero-backend
+    repository: nodeloom-backend
     tag: latest
     pullPolicy: IfNotPresent
   resources:
@@ -31,7 +31,7 @@ backend:
 frontend:
   replicaCount: 2
   image:
-    repository: agenthero-frontend
+    repository: nodeloom-frontend
     tag: latest
     pullPolicy: IfNotPresent
   resources:
@@ -47,8 +47,8 @@ postgresql:
   enabled: true
   image: pgvector/pgvector:pg16
   auth:
-    database: agenthero
-    username: agenthero
+    database: nodeloom
+    username: nodeloom
     # Set via --set postgresql.auth.password=xxx
     password: ""
   persistence:
@@ -96,7 +96,7 @@ ingress:
         - path: /
           service: backend
   tls: []
-  #  - secretName: agenthero-tls
+  #  - secretName: nodeloom-tls
   #    hosts:
   #      - app.yourdomain.com
   #      - api.yourdomain.com
@@ -125,7 +125,7 @@ secrets:
 # Service account
 serviceAccount:
   create: true
-  name: agenthero
+  name: nodeloom
   annotations: {}
 
 # Pod security context

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   accessModes:
     - ReadWriteOnce
@@ -15,7 +15,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   serviceName: postgres
   replicas: 1
@@ -36,17 +36,17 @@ spec:
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: agenthero-config
+                  name: nodeloom-config
                   key: POSTGRES_DB
             - name: POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
-                  name: agenthero-config
+                  name: nodeloom-config
                   key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: agenthero-secrets
+                  name: nodeloom-secrets
                   key: POSTGRES_PASSWORD
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
@@ -65,7 +65,7 @@ spec:
               command:
                 - pg_isready
                 - -U
-                - agenthero
+                - nodeloom
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
@@ -73,7 +73,7 @@ spec:
               command:
                 - pg_isready
                 - -U
-                - agenthero
+                - nodeloom
             initialDelaySeconds: 5
             periodSeconds: 5
       volumes:
@@ -85,7 +85,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: agenthero
+  namespace: nodeloom
 spec:
   selector:
     app: postgres

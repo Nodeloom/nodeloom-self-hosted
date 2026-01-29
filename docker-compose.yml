@@ -48,6 +48,18 @@ services:
       redis:
         condition: service_healthy
     environment:
+      # Self-Hosted Mode
+      APP_DEPLOYMENT_MODE: SELF_HOSTED
+      APP_LICENSING_ENABLED: "true"
+      NODELOOM_LICENSE_KEY: ${NODELOOM_LICENSE_KEY:?NODELOOM_LICENSE_KEY is required}
+      LICENSE_VALIDATION_URL: ${LICENSE_VALIDATION_URL:-https://license.nodeloom.io/api/licenses/validate}
+
+      # Initial Admin User (required on first startup)
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is required}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
+      ADMIN_FIRST_NAME: ${ADMIN_FIRST_NAME:-Admin}
+      ADMIN_LAST_NAME: ${ADMIN_LAST_NAME:-User}
+
       # Database
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-nodeloom}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-nodeloom}

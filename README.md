@@ -21,13 +21,21 @@ cd nodeloom-self-hosted
 
 # Copy and configure environment
 cp .env.example .env
-# Edit .env with your settings (JWT secret, API keys, etc.)
+
+# Edit .env with your settings:
+# - NODELOOM_LICENSE_KEY (required - obtain from NodeLoom)
+# - ADMIN_EMAIL and ADMIN_PASSWORD (required - initial admin credentials)
+# - POSTGRES_PASSWORD and REDIS_PASSWORD (required - database security)
+# - JWT_SECRET (required - generate with: openssl rand -base64 64)
 
 # Start all services
 docker-compose up -d
 
 # Access NodeLoom
 open http://localhost:3000
+
+# Log in with your ADMIN_EMAIL and ADMIN_PASSWORD
+# Change password via Settings → Security (recommended)
 ```
 
 ### Kubernetes
@@ -59,6 +67,29 @@ helm install nodeloom ./helm/nodeloom \
   --create-namespace \
   -f my-values.yaml
 ```
+
+## User Management
+
+Self-hosted NodeLoom has different user management than the SaaS version:
+
+| Feature | SaaS | Self-Hosted |
+|---------|------|-------------|
+| Public Registration | Yes | **Disabled** |
+| Initial Admin | Self-registration | Environment variables |
+| Add Users | Invite + Registration | Admin invitation or SSO |
+| SSO/SAML | Enterprise feature | Fully supported |
+
+### Initial Setup
+1. Configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`
+2. Start NodeLoom - admin user is auto-created on first boot
+3. Log in with admin credentials
+4. **Change password** via Settings → Security (recommended)
+5. Invite additional users or configure SSO
+
+### Adding Users
+- **Admin Invitation**: Admins can invite users via Settings → Team
+- **SSO/SAML**: Configure enterprise SSO for automatic user provisioning
+- **No Public Registration**: Users cannot self-register
 
 ## Requirements
 

@@ -19,14 +19,20 @@ Deploy NodeLoom on your own infrastructure. This repository contains deployment 
 git clone https://github.com/reedzerrad/nodeloom-self-hosted.git
 cd nodeloom-self-hosted
 
-# Copy and configure environment
+# Copy environment template
 cp .env.example .env
 
-# Edit .env with your settings:
-# - NODELOOM_LICENSE_KEY (required - obtain from NodeLoom)
-# - ADMIN_EMAIL and ADMIN_PASSWORD (required - initial admin credentials)
-# - POSTGRES_PASSWORD and REDIS_PASSWORD (required - database security)
-# - JWT_SECRET (required - generate with: openssl rand -base64 64)
+# Generate required secrets (copy output to .env)
+echo "APP_ENCRYPTION_KEY=$(openssl rand -base64 32)"
+echo "JWT_SECRET=$(openssl rand -base64 64)"
+echo "APP_ADMIN_API_KEY=$(openssl rand -base64 32)"
+echo "POSTGRES_PASSWORD=$(openssl rand -base64 24)"
+echo "REDIS_PASSWORD=$(openssl rand -base64 24)"
+
+# Edit .env with:
+# - Paste the generated secrets above
+# - NODELOOM_LICENSE_KEY (obtain from NodeLoom)
+# - ADMIN_EMAIL and ADMIN_PASSWORD (initial admin credentials)
 
 # Start all services
 docker-compose up -d
@@ -37,6 +43,8 @@ open http://localhost:3000
 # Log in with your ADMIN_EMAIL and ADMIN_PASSWORD
 # Change password via Settings → Security (recommended)
 ```
+
+> **Security Note**: The application will not start without valid security secrets. Never use example/default values in production.
 
 ### Kubernetes
 
@@ -80,11 +88,33 @@ Self-hosted NodeLoom has different user management than the SaaS version:
 | SSO/SAML | Enterprise feature | Fully supported |
 
 ### Initial Setup
-1. Configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`
-2. Start NodeLoom - admin user is auto-created on first boot
-3. Log in with admin credentials
-4. **Change password** via Settings → Security (recommended)
-5. Invite additional users or configure SSO
+1. Generate security secrets (see Quick Start above)
+2. Configure all required values in `.env`
+3. Start NodeLoom - admin user is auto-created on first boot
+4. Log in with admin credentials
+5. **Change password** via Settings → Security (recommended)
+6. Configure OAuth providers via Admin → OAuth Providers (optional)
+7. Invite additional users or configure SSO
+
+## Security
+
+### Required Secrets
+
+| Secret | Purpose | Generate With |
+|--------|---------|---------------|
+| `APP_ENCRYPTION_KEY` | Encrypts stored credentials (AES-256-GCM) | `openssl rand -base64 32` |
+| `JWT_SECRET` | Signs authentication tokens | `openssl rand -base64 64` |
+| `APP_ADMIN_API_KEY` | Backoffice API authentication | `openssl rand -base64 32` |
+| `POSTGRES_PASSWORD` | Database authentication | `openssl rand -base64 24` |
+| `REDIS_PASSWORD` | Cache authentication | `openssl rand -base64 24` |
+
+### Important Security Notes
+
+- **Startup Validation**: The application will not start without valid security secrets
+- **Weak Key Detection**: Keys containing "dev-", "test-", "example" are rejected in production
+- **Encryption Key Persistence**: If you change `APP_ENCRYPTION_KEY`, all stored credentials become unreadable
+- **Unique Keys**: Never reuse keys across environments (dev, staging, production)
+- **Backup Keys**: Store your encryption key securely - it's required to decrypt credentials after restore
 
 ### Adding Users
 - **Admin Invitation**: Admins can invite users via Settings → Team

@@ -42,7 +42,7 @@ curl http://localhost:8080/actuator/health
 
 ```bash
 # Edit .env file
-AGENTHERO_VERSION=1.2.0
+NODELOOM_VERSION=1.2.0
 
 # Pull and restart
 docker-compose pull
@@ -56,7 +56,7 @@ docker-compose up -d
 docker-compose down
 
 # 2. Set previous version
-# Edit .env: AGENTHERO_VERSION=1.1.0
+# Edit .env: NODELOOM_VERSION=1.1.0
 
 # 3. Restore database
 cat backup_before_upgrade.sql | docker-compose exec -T postgres psql -U nodeloom nodeloom

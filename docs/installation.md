@@ -170,11 +170,15 @@ This guide covers the complete installation of NodeLoom on your own infrastructu
 
 ## Post-Installation
 
-### Create Admin User
+### Initial Login
 
-1. Access the application at your configured URL
-2. Click "Register" to create the first user
-3. The first user automatically becomes the admin
+1. Access the application at your configured URL (default: `http://localhost:3000`)
+2. Log in with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` configured in your `.env` file
+3. **Change your password** via Settings > Security (recommended)
+4. Configure OAuth providers via Settings > OAuth Providers (optional)
+5. Invite additional users via Settings > Team, or configure SSO
+
+> **Note**: Public registration is disabled in self-hosted mode. Users are added via admin invitation or SSO/SCIM provisioning.
 
 ### Configure DNS
 

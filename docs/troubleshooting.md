@@ -91,17 +91,88 @@ docker-compose exec redis redis-cli -a $REDIS_PASSWORD ping
 - Redis not started
 - Network issues
 
-### 4. Frontend Shows "Failed to fetch"
+### 4. Encryption Key Issues
+
+**Symptoms:**
+- Credentials that previously worked now fail
+- Errors like `AEADBadTagException` or `BadPaddingException` in logs
+- OAuth connections and stored API keys stop working
+
+**Cause:** The `APP_ENCRYPTION_KEY` was changed or lost. All stored credentials (OAuth tokens, API keys, database passwords) are encrypted with AES-256-GCM using this key.
+
+**Important:**
+- **If you changed the key**, there is no way to recover previously encrypted credentials. Users must re-connect all OAuth integrations and re-enter API keys.
+- **If you lost the key**, the same applies — encrypted data is permanently unreadable.
+- **Always back up** `APP_ENCRYPTION_KEY` separately from database backups.
+
+**Check:**
+```bash
+# Verify the key is set
+docker-compose exec backend env | grep APP_ENCRYPTION_KEY
+
+# Check for decryption errors in logs
+docker-compose logs backend | grep -i "decrypt\|encryption\|AES\|BadTag"
+```
+
+**Recovery:**
+1. Set a new `APP_ENCRYPTION_KEY` in `.env`
+2. Restart: `docker-compose up -d`
+3. Have all users re-connect their OAuth integrations and re-enter credentials
+
+### 5. Frontend Shows "Failed to fetch" / CORS Errors
+
+**Symptoms:**
+- Browser console shows `CORS policy` errors
+- API calls blocked with `Access-Control-Allow-Origin` errors
+- Frontend loads but can't communicate with backend
 
 **Check:**
 1. Backend is running: `curl http://localhost:8080/actuator/health`
-2. CORS is configured correctly
-3. PUBLIC_API_URL is correct in frontend config
+2. `APP_CORS_ALLOWED_ORIGINS` matches your frontend URL exactly (including protocol and port)
+3. `PUBLIC_API_URL` is correct in frontend config
 
-**Fix CORS (if needed):**
-Ensure backend allows frontend origin in CORS configuration.
+**Fix CORS:**
+```bash
+# In .env, set to your actual frontend domain (no trailing slash)
+APP_CORS_ALLOWED_ORIGINS=https://app.yourdomain.com
 
-### 5. Cannot Login / Auth Issues
+# For multiple domains
+APP_CORS_ALLOWED_ORIGINS=https://app.yourdomain.com,https://admin.yourdomain.com
+
+# Restart backend
+docker-compose restart backend
+```
+
+**Common mistakes:**
+- Trailing slash: `https://app.example.com/` (wrong) vs `https://app.example.com` (correct)
+- Missing protocol: `app.example.com` (wrong) vs `https://app.example.com` (correct)
+- Wildcard `*` — never use in production
+
+### 6. APP_BASE_URL / APP_FRONTEND_URL Misconfiguration
+
+**Symptoms:**
+- OAuth callbacks redirect to `localhost` instead of your domain
+- Password reset emails contain wrong links
+- Webhook URLs point to wrong address
+- Widget embed URLs are broken
+
+**Cause:** `APP_BASE_URL` and/or `APP_FRONTEND_URL` are not set to your production domains.
+
+**Fix:**
+```bash
+# In .env — set to your actual domains (no trailing slash)
+APP_BASE_URL=https://api.yourdomain.com
+APP_FRONTEND_URL=https://app.yourdomain.com
+
+# Restart
+docker-compose restart backend
+```
+
+**What each URL affects:**
+- `APP_BASE_URL` — OAuth callback URLs, webhook endpoints, SCIM endpoints, widget API calls
+- `APP_FRONTEND_URL` — Email links (password reset, invitations), Stripe redirect URLs
+
+### 7. Cannot Login / Auth Issues
 
 **Check JWT configuration:**
 ```bash
@@ -114,7 +185,7 @@ docker-compose exec backend env | grep JWT
 docker-compose logs backend | grep -i "auth\|jwt\|token"
 ```
 
-### 6. Slow Performance
+### 8. Slow Performance
 
 **Database:**
 ```bash
@@ -144,15 +215,16 @@ services:
           memory: 4G
 ```
 
-### 7. WebSocket Not Connecting
+### 9. WebSocket Not Connecting
 
 **Symptoms:**
 - Real-time updates not working
 - "WebSocket connection failed" in browser console
 
 **Check:**
-1. Nginx/Ingress configured for WebSocket
-2. Proxy timeout settings sufficient
+1. `APP_CORS_ALLOWED_ORIGINS` includes your frontend domain (WebSocket connections respect CORS)
+2. Nginx/Ingress configured for WebSocket upgrade
+3. Proxy timeout settings sufficient (300s+ recommended)
 
 **Nginx configuration:**
 ```nginx
@@ -165,7 +237,7 @@ location /ws {
 }
 ```
 
-### 8. Workflow Execution Fails
+### 10. Workflow Execution Fails
 
 **Check executor logs:**
 ```bash
@@ -177,7 +249,7 @@ docker-compose logs backend | grep -i "execution\|workflow"
 - External service not reachable
 - Timeout issues
 
-### 9. Out of Disk Space
+### 11. Out of Disk Space
 
 **Check disk usage:**
 ```bash
@@ -191,7 +263,7 @@ docker-compose exec postgres psql -U nodeloom nodeloom -c "
 "
 ```
 
-### 10. SSL/TLS Certificate Issues
+### 12. SSL/TLS Certificate Issues
 
 **Check certificate:**
 ```bash

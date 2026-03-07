@@ -4,22 +4,45 @@ Security best practices and hardening for NodeLoom self-hosted deployments.
 
 ## Security Checklist
 
-- [ ] Strong passwords generated for all services
+- [ ] All required secrets generated with strong random values
+- [ ] `APP_ENCRYPTION_KEY` stored securely and backed up
 - [ ] JWT secret is 256+ bits
-- [ ] TLS/HTTPS enabled
-- [ ] Database not exposed to public
-- [ ] Redis not exposed to public
-- [ ] Regular backups configured
+- [ ] TLS/HTTPS enabled for all public endpoints
+- [ ] Database not exposed to public network
+- [ ] Redis not exposed to public network
+- [ ] `FORWARD_HEADERS_STRATEGY` set to `NATIVE` (behind proxy)
+- [ ] `APP_CORS_ALLOWED_ORIGINS` set to your actual frontend domain
+- [ ] `APP_BASE_URL` and `APP_FRONTEND_URL` set to production domains
+- [ ] Regular backups configured and tested
 - [ ] Audit logging enabled
 - [ ] Network policies configured (Kubernetes)
+- [ ] CAPTCHA enabled if registration is exposed
+- [ ] SCIM tokens managed securely (if using SSO/SAML)
+- [ ] Container images kept up to date
 
 ## Secrets Management
+
+### Required Secrets
+
+| Secret | Purpose | Impact if Compromised |
+|--------|---------|----------------------|
+| `APP_ENCRYPTION_KEY` | Encrypts all stored credentials (AES-256-GCM) | All credentials exposed |
+| `JWT_SECRET` | Signs authentication tokens | Account takeover |
+| `APP_ADMIN_API_KEY` | Backoffice API access | Admin-level access |
+| `POSTGRES_PASSWORD` | Database access | Full data access |
+| `REDIS_PASSWORD` | Cache/session access | Session hijacking |
 
 ### Generate Strong Secrets
 
 ```bash
+# Encryption key (AES-256-GCM) - BACK THIS UP!
+openssl rand -base64 32
+
 # JWT Secret (256-bit minimum)
 openssl rand -base64 64
+
+# Admin API key
+openssl rand -base64 32
 
 # Database password
 openssl rand -base64 32
@@ -27,6 +50,17 @@ openssl rand -base64 32
 # Redis password
 openssl rand -base64 32
 ```
+
+### Encryption Key Management
+
+The `APP_ENCRYPTION_KEY` is the most critical secret in a NodeLoom deployment:
+
+- **All stored credentials** (API keys, OAuth tokens, database passwords) are encrypted with this key using AES-256-GCM
+- **If you lose this key**, all stored credentials become permanently unreadable
+- **If you change this key**, existing encrypted credentials cannot be decrypted
+- **Back up this key** in a secure location separate from your database backups
+- **Never reuse** this key across environments (dev, staging, production)
+- The application **will not start** without a valid encryption key in production
 
 ### Kubernetes Secrets
 
@@ -48,6 +82,9 @@ spec:
   target:
     name: nodeloom-secrets
   data:
+    - secretKey: APP_ENCRYPTION_KEY
+      remoteRef:
+        key: nodeloom/encryption-key
     - secretKey: JWT_SECRET
       remoteRef:
         key: nodeloom/jwt-secret
@@ -68,51 +105,11 @@ spec:
    # - key.pem
    ```
 
-2. **Create Nginx configuration:**
-   ```nginx
-   # nginx/conf.d/default.conf
-   server {
-       listen 80;
-       server_name _;
-       return 301 https://$host$request_uri;
-   }
-
-   server {
-       listen 443 ssl http2;
-       server_name app.yourdomain.com;
-
-       ssl_certificate /etc/nginx/ssl/cert.pem;
-       ssl_certificate_key /etc/nginx/ssl/key.pem;
-       ssl_protocols TLSv1.2 TLSv1.3;
-       ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
-
-       location / {
-           proxy_pass http://frontend:3000;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-       }
-   }
-
-   server {
-       listen 443 ssl http2;
-       server_name api.yourdomain.com;
-
-       ssl_certificate /etc/nginx/ssl/cert.pem;
-       ssl_certificate_key /etc/nginx/ssl/key.pem;
-
-       location / {
-           proxy_pass http://backend:8080;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-Proto $scheme;
-
-           # WebSocket support
-           proxy_http_version 1.1;
-           proxy_set_header Upgrade $http_upgrade;
-           proxy_set_header Connection "upgrade";
-       }
-   }
-   ```
+2. **The included Nginx config** (`nginx/conf.d/default.conf`) provides:
+   - HTTP to HTTPS redirect
+   - Separate server blocks for frontend (`app.yourdomain.com`) and backend API (`api.yourdomain.com`)
+   - WebSocket support for real-time features
+   - Security headers (X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
 
 3. **Enable Nginx profile:**
    ```bash
@@ -224,6 +221,33 @@ spec:
         - port: 443
 ```
 
+## CORS Configuration
+
+Set `APP_CORS_ALLOWED_ORIGINS` to your actual frontend domain(s). This controls which origins can make API requests:
+
+```bash
+# Single domain
+APP_CORS_ALLOWED_ORIGINS=https://app.yourdomain.com
+
+# Multiple domains (comma-separated)
+APP_CORS_ALLOWED_ORIGINS=https://app.yourdomain.com,https://admin.yourdomain.com
+```
+
+**Never use wildcards in production.** WebSocket connections also respect this setting.
+
+## Proxy Headers
+
+When NodeLoom is behind a reverse proxy (nginx, ALB, Cloudflare), set:
+
+```bash
+FORWARD_HEADERS_STRATEGY=NATIVE
+```
+
+This ensures:
+- `X-Forwarded-For` is trusted for client IP detection (rate limiting, audit logs)
+- `X-Forwarded-Proto` is trusted for HTTPS detection (cookie security)
+- Without this, rate limiting uses proxy IP instead of client IP
+
 ## Database Security
 
 ### PostgreSQL
@@ -247,11 +271,19 @@ spec:
 
 ### RBAC
 
-NodeLoom includes built-in RBAC with these roles:
+NodeLoom includes built-in RBAC with 5 roles:
 - **Admin** - Full access
-- **Builder** - Create/edit workflows
+- **Builder** - Create/edit workflows, manage credentials
 - **Operator** - Execute workflows
 - **Viewer** - Read-only access
+- **Compliance Officer** - View-only + audit logs + compliance dashboard
+
+### SCIM 2.0 Provisioning
+
+For enterprise SSO integration (Okta, Azure AD, OneLogin):
+- Bearer token authentication with per-token IP allowlisting (CIDR support)
+- Rate limiting configurable via `SCIM_RATE_LIMIT_PER_MINUTE`
+- Group-to-role mapping (Admins->ADMIN, Builders->BUILDER, etc.)
 
 ### Audit Logging
 
@@ -261,6 +293,7 @@ All actions are logged with:
 - Timestamp
 - IP address
 - Resource affected
+- SHA-256 cryptographic hash chain for tamper detection
 
 View logs in the Audit section of the UI.
 
@@ -270,6 +303,7 @@ View logs in the Audit section of the UI.
 - JWT tokens expire after 24 hours
 - Refresh tokens for seamless re-authentication
 - Rate limiting enabled by default
+- Widget endpoints rate limited separately (30 req/min per IP)
 
 ## Container Security
 
@@ -330,6 +364,6 @@ resources:
 
 1. **Isolate affected systems**
 2. **Preserve logs for analysis**
-3. **Rotate all secrets**
-4. **Review audit logs**
+3. **Rotate all secrets** (especially `APP_ENCRYPTION_KEY` if compromised)
+4. **Review audit logs** (check hash chain integrity via Compliance Dashboard)
 5. **Contact support@nodeloom.io**

@@ -103,14 +103,28 @@ ingress:
 
 # Secrets - REQUIRED: Set these values!
 secrets:
+  # REQUIRED: Encryption key for credential storage (AES-256-GCM)
+  # Generate with: openssl rand -base64 32
+  appEncryptionKey: ""
+  # REQUIRED: JWT signing secret (min 256 bits)
   # Generate with: openssl rand -base64 64
   jwtSecret: ""
+  # REQUIRED: Admin API key for backoffice communication
+  # Generate with: openssl rand -base64 32
+  adminApiKey: ""
+  # REQUIRED: License key (obtain from NodeLoom)
+  licenseKey: ""
+  # REQUIRED: Initial admin credentials (first startup only)
+  adminEmail: "admin@yourcompany.com"
+  adminPassword: ""
+
   # AI Provider API keys (optional)
   openaiApiKey: ""
   anthropicApiKey: ""
   googleAiApiKey: ""
   azureOpenaiApiKey: ""
   azureOpenaiEndpoint: ""
+
   # OAuth credentials (optional)
   googleClientId: ""
   googleClientSecret: ""
@@ -118,9 +132,74 @@ secrets:
   githubClientSecret: ""
   slackClientId: ""
   slackClientSecret: ""
+  microsoftClientId: ""
+  microsoftClientSecret: ""
+  salesforceClientId: ""
+  salesforceClientSecret: ""
+  hubspotClientId: ""
+  hubspotClientSecret: ""
+  shopifyClientId: ""
+  shopifyClientSecret: ""
+  zoomClientId: ""
+  zoomClientSecret: ""
+  asanaClientId: ""
+  asanaClientSecret: ""
+  linearClientId: ""
+  linearClientSecret: ""
+  jiraClientId: ""
+  jiraClientSecret: ""
+  notionClientId: ""
+  notionClientSecret: ""
+
+  # CAPTCHA (optional)
+  captchaSiteKey: ""
+  captchaSecretKey: ""
+
   # Stripe (optional)
   stripeSecretKey: ""
   stripeWebhookSecret: ""
+
+  # Axiom logging (optional)
+  axiomToken: ""
+
+# Application configuration
+config:
+  # Application URLs (REQUIRED - change to your actual domains)
+  appBaseUrl: "https://api.yourdomain.com"
+  appFrontendUrl: "https://app.yourdomain.com"
+  corsAllowedOrigins: "https://app.yourdomain.com"
+
+  # Proxy (NATIVE when behind ingress/LB)
+  forwardHeadersStrategy: "NATIVE"
+
+  # Self-hosted mode
+  deploymentMode: "SELF_HOSTED"
+  licenseValidationEnabled: "true"
+  licenseValidationUrl: "https://license.nodeloom.io/api/licenses/validate"
+  licenseCacheTtlHours: "24"
+  licenseRevalidationIntervalHours: "6"
+  licenseGracePeriodHours: "72"
+  licenseValidationTimeoutSeconds: "30"
+
+  # Features
+  captchaEnabled: "false"
+  captchaVerifyUrl: "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+  stripeEnabled: "false"
+  sandboxEnabled: "false"
+  sandboxPullImages: "true"
+  scimRateLimitEnabled: "true"
+  scimRateLimitPerMinute: "60"
+
+  # Connection pool
+  hikariMaxPoolSize: "20"
+  hikariMinIdle: "5"
+
+  # Logging
+  logLevelApp: "INFO"
+  logLevelSecurity: "WARN"
+  logLevelWeb: "WARN"
+  logLevelSql: "WARN"
+  axiomDataset: "nodeloom-production"
 
 # Service account
 serviceAccount:

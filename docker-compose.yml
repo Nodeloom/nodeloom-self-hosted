@@ -20,6 +20,12 @@ services:
       retries: 5
     networks:
       - nodeloom-network
+    deploy:
+      resources:
+        limits:
+          memory: ${POSTGRES_MEMORY_LIMIT:-4G}
+        reservations:
+          memory: 1G
 
   redis:
     image: redis:7-alpine
@@ -37,9 +43,15 @@ services:
       retries: 5
     networks:
       - nodeloom-network
+    deploy:
+      resources:
+        limits:
+          memory: ${REDIS_MEMORY_LIMIT:-1G}
+        reservations:
+          memory: 256M
 
   backend:
-    image: ghcr.io/reedzerrad/nodeloom-backend:${AGENTHERO_VERSION:-latest}
+    image: ghcr.io/reedzerrad/nodeloom-backend:${NODELOOM_VERSION:-latest}
     container_name: nodeloom-backend
     restart: unless-stopped
     depends_on:
@@ -48,56 +60,142 @@ services:
       redis:
         condition: service_healthy
     environment:
+      # ===========================================
       # Self-Hosted Mode
-      APP_DEPLOYMENT_MODE: SELF_HOSTED
-      APP_LICENSING_ENABLED: "true"
+      # ===========================================
+      DEPLOYMENT_MODE: SELF_HOSTED
+      LICENSE_VALIDATION_ENABLED: "true"
       NODELOOM_LICENSE_KEY: ${NODELOOM_LICENSE_KEY:?NODELOOM_LICENSE_KEY is required}
       LICENSE_VALIDATION_URL: ${LICENSE_VALIDATION_URL:-https://license.nodeloom.io/api/licenses/validate}
+      LICENSE_CACHE_TTL_HOURS: ${LICENSE_CACHE_TTL_HOURS:-24}
+      LICENSE_REVALIDATION_INTERVAL_HOURS: ${LICENSE_REVALIDATION_INTERVAL_HOURS:-6}
+      LICENSE_GRACE_PERIOD_HOURS: ${LICENSE_GRACE_PERIOD_HOURS:-72}
+      LICENSE_VALIDATION_TIMEOUT_SECONDS: ${LICENSE_VALIDATION_TIMEOUT_SECONDS:-30}
+      MACHINE_ID: ${MACHINE_ID:-}
 
-      # Initial Admin User (required on first startup)
+      # ===========================================
+      # Initial Admin User (first startup only)
+      # ===========================================
       ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is required}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
       ADMIN_FIRST_NAME: ${ADMIN_FIRST_NAME:-Admin}
       ADMIN_LAST_NAME: ${ADMIN_LAST_NAME:-User}
 
+      # ===========================================
+      # Security (REQUIRED)
+      # ===========================================
+      APP_ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY:?APP_ENCRYPTION_KEY is required}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      ADMIN_API_KEY: ${APP_ADMIN_API_KEY:?APP_ADMIN_API_KEY is required}
+
+      # ===========================================
       # Database
+      # ===========================================
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-nodeloom}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-nodeloom}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      HIKARI_MAX_POOL_SIZE: ${HIKARI_MAX_POOL_SIZE:-20}
+      HIKARI_MIN_IDLE: ${HIKARI_MIN_IDLE:-5}
 
+      # ===========================================
       # Redis
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      # ===========================================
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
 
-      # Security
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      # ===========================================
+      # Application URLs
+      # ===========================================
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+      APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:3000}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:3000}
 
+      # ===========================================
+      # Proxy / Network
+      # ===========================================
+      # Set to NATIVE when behind a reverse proxy (nginx, ALB, etc.)
+      FORWARD_HEADERS_STRATEGY: ${FORWARD_HEADERS_STRATEGY:-NATIVE}
+
+      # ===========================================
       # AI Providers (optional)
+      # ===========================================
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY:-}
       AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-}
       AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT:-}
 
-      # OAuth (optional)
+      # ===========================================
+      # OAuth Providers (optional)
+      # ===========================================
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
       SLACK_CLIENT_ID: ${SLACK_CLIENT_ID:-}
       SLACK_CLIENT_SECRET: ${SLACK_CLIENT_SECRET:-}
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID:-}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET:-}
+      SALESFORCE_CLIENT_ID: ${SALESFORCE_CLIENT_ID:-}
+      SALESFORCE_CLIENT_SECRET: ${SALESFORCE_CLIENT_SECRET:-}
+      HUBSPOT_CLIENT_ID: ${HUBSPOT_CLIENT_ID:-}
+      HUBSPOT_CLIENT_SECRET: ${HUBSPOT_CLIENT_SECRET:-}
+      SHOPIFY_CLIENT_ID: ${SHOPIFY_CLIENT_ID:-}
+      SHOPIFY_CLIENT_SECRET: ${SHOPIFY_CLIENT_SECRET:-}
+      SHOPIFY_SHOP_DOMAIN: ${SHOPIFY_SHOP_DOMAIN:-}
+      ZOOM_CLIENT_ID: ${ZOOM_CLIENT_ID:-}
+      ZOOM_CLIENT_SECRET: ${ZOOM_CLIENT_SECRET:-}
+      ASANA_CLIENT_ID: ${ASANA_CLIENT_ID:-}
+      ASANA_CLIENT_SECRET: ${ASANA_CLIENT_SECRET:-}
+      LINEAR_CLIENT_ID: ${LINEAR_CLIENT_ID:-}
+      LINEAR_CLIENT_SECRET: ${LINEAR_CLIENT_SECRET:-}
+      JIRA_CLIENT_ID: ${JIRA_CLIENT_ID:-}
+      JIRA_CLIENT_SECRET: ${JIRA_CLIENT_SECRET:-}
+      NOTION_CLIENT_ID: ${NOTION_CLIENT_ID:-}
+      NOTION_CLIENT_SECRET: ${NOTION_CLIENT_SECRET:-}
 
-      # Stripe (optional)
+      # ===========================================
+      # CAPTCHA (optional)
+      # ===========================================
+      CAPTCHA_ENABLED: ${CAPTCHA_ENABLED:-false}
+      CAPTCHA_SITE_KEY: ${CAPTCHA_SITE_KEY:-}
+      CAPTCHA_SECRET_KEY: ${CAPTCHA_SECRET_KEY:-}
+      CAPTCHA_VERIFY_URL: ${CAPTCHA_VERIFY_URL:-https://challenges.cloudflare.com/turnstile/v0/siteverify}
+
+      # ===========================================
+      # Stripe Billing (optional)
+      # ===========================================
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       STRIPE_ENABLED: ${STRIPE_ENABLED:-false}
 
-      # Sandbox (optional)
-      AGENTHERO_SANDBOX_ENABLED: ${SANDBOX_ENABLED:-false}
-      AGENTHERO_SANDBOX_DOCKER_HOST: ${SANDBOX_DOCKER_HOST:-unix:///var/run/docker.sock}
+      # ===========================================
+      # Sandbox Execution (optional)
+      # ===========================================
+      SANDBOX_ENABLED: ${SANDBOX_ENABLED:-false}
+      DOCKER_HOST: ${SANDBOX_DOCKER_HOST:-unix:///var/run/docker.sock}
+      SANDBOX_PULL_IMAGES: ${SANDBOX_PULL_IMAGES:-true}
 
-      # Application
+      # ===========================================
+      # SCIM Rate Limiting (optional)
+      # ===========================================
+      SCIM_RATE_LIMIT_ENABLED: ${SCIM_RATE_LIMIT_ENABLED:-true}
+      SCIM_RATE_LIMIT_PER_MINUTE: ${SCIM_RATE_LIMIT_PER_MINUTE:-60}
+
+      # ===========================================
+      # Logging (optional)
+      # ===========================================
+      LOG_LEVEL_APP: ${LOG_LEVEL_APP:-INFO}
+      LOG_LEVEL_SECURITY: ${LOG_LEVEL_SECURITY:-WARN}
+      LOG_LEVEL_WEB: ${LOG_LEVEL_WEB:-WARN}
+      LOG_LEVEL_SQL: ${LOG_LEVEL_SQL:-WARN}
+      AXIOM_TOKEN: ${AXIOM_TOKEN:-}
+      AXIOM_DATASET: ${AXIOM_DATASET:-nodeloom-production}
+
+      # ===========================================
+      # Spring
+      # ===========================================
       SERVER_PORT: 8080
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-production}
     ports:
@@ -113,9 +211,15 @@ services:
       start_period: 60s
     networks:
       - nodeloom-network
+    deploy:
+      resources:
+        limits:
+          memory: ${BACKEND_MEMORY_LIMIT:-4G}
+        reservations:
+          memory: 1G
 
   frontend:
-    image: ghcr.io/reedzerrad/nodeloom-frontend:${AGENTHERO_VERSION:-latest}
+    image: ghcr.io/reedzerrad/nodeloom-frontend:${NODELOOM_VERSION:-latest}
     container_name: nodeloom-frontend
     restart: unless-stopped
     depends_on:
@@ -131,6 +235,12 @@ services:
       retries: 3
     networks:
       - nodeloom-network
+    deploy:
+      resources:
+        limits:
+          memory: ${FRONTEND_MEMORY_LIMIT:-512M}
+        reservations:
+          memory: 256M
 
   # Optional: Nginx reverse proxy with SSL
   nginx:

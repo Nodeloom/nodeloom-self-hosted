@@ -20,7 +20,78 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            # Database
+            # --- Security (REQUIRED) ---
+            - name: APP_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: APP_ENCRYPTION_KEY
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: JWT_SECRET
+            - name: ADMIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: APP_ADMIN_API_KEY
+
+            # --- Self-Hosted Mode ---
+            - name: DEPLOYMENT_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: DEPLOYMENT_MODE
+            - name: LICENSE_VALIDATION_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LICENSE_VALIDATION_ENABLED
+            - name: NODELOOM_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: NODELOOM_LICENSE_KEY
+            - name: LICENSE_VALIDATION_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LICENSE_VALIDATION_URL
+            - name: LICENSE_CACHE_TTL_HOURS
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LICENSE_CACHE_TTL_HOURS
+            - name: LICENSE_GRACE_PERIOD_HOURS
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LICENSE_GRACE_PERIOD_HOURS
+            - name: LICENSE_REVALIDATION_INTERVAL_HOURS
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LICENSE_REVALIDATION_INTERVAL_HOURS
+            - name: LICENSE_VALIDATION_TIMEOUT_SECONDS
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LICENSE_VALIDATION_TIMEOUT_SECONDS
+
+            # --- Initial Admin ---
+            - name: ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: ADMIN_EMAIL
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: ADMIN_PASSWORD
+
+            # --- Database ---
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://postgres:5432/nodeloom
             - name: SPRING_DATASOURCE_USERNAME
@@ -33,29 +104,57 @@ spec:
                 secretKeyRef:
                   name: nodeloom-secrets
                   key: POSTGRES_PASSWORD
-            # Redis
-            - name: SPRING_REDIS_HOST
+            - name: HIKARI_MAX_POOL_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: HIKARI_MAX_POOL_SIZE
+            - name: HIKARI_MIN_IDLE
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: HIKARI_MIN_IDLE
+
+            # --- Redis ---
+            - name: SPRING_DATA_REDIS_HOST
               valueFrom:
                 configMapKeyRef:
                   name: nodeloom-config
                   key: SPRING_REDIS_HOST
-            - name: SPRING_REDIS_PORT
+            - name: SPRING_DATA_REDIS_PORT
               valueFrom:
                 configMapKeyRef:
                   name: nodeloom-config
                   key: SPRING_REDIS_PORT
-            - name: SPRING_REDIS_PASSWORD
+            - name: SPRING_DATA_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: nodeloom-secrets
                   key: REDIS_PASSWORD
-            # Security
-            - name: JWT_SECRET
+
+            # --- Application URLs ---
+            - name: APP_BASE_URL
               valueFrom:
-                secretKeyRef:
-                  name: nodeloom-secrets
-                  key: JWT_SECRET
-            # AI Providers
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: APP_BASE_URL
+            - name: APP_FRONTEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: APP_FRONTEND_URL
+            - name: APP_CORS_ALLOWED_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: APP_CORS_ALLOWED_ORIGINS
+            - name: FORWARD_HEADERS_STRATEGY
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: FORWARD_HEADERS_STRATEGY
+
+            # --- AI Providers ---
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -71,7 +170,18 @@ spec:
                 secretKeyRef:
                   name: nodeloom-secrets
                   key: GOOGLE_AI_API_KEY
-            # OAuth
+            - name: AZURE_OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: AZURE_OPENAI_API_KEY
+            - name: AZURE_OPENAI_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: AZURE_OPENAI_ENDPOINT
+
+            # --- OAuth Providers ---
             - name: GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
@@ -92,7 +202,203 @@ spec:
                 secretKeyRef:
                   name: nodeloom-secrets
                   key: GITHUB_CLIENT_SECRET
-            # Spring
+            - name: SLACK_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: SLACK_CLIENT_ID
+            - name: SLACK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: SLACK_CLIENT_SECRET
+            - name: MICROSOFT_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: MICROSOFT_CLIENT_ID
+            - name: MICROSOFT_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: MICROSOFT_CLIENT_SECRET
+            - name: SALESFORCE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: SALESFORCE_CLIENT_ID
+            - name: SALESFORCE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: SALESFORCE_CLIENT_SECRET
+            - name: HUBSPOT_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: HUBSPOT_CLIENT_ID
+            - name: HUBSPOT_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: HUBSPOT_CLIENT_SECRET
+            - name: SHOPIFY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: SHOPIFY_CLIENT_ID
+            - name: SHOPIFY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: SHOPIFY_CLIENT_SECRET
+            - name: ZOOM_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: ZOOM_CLIENT_ID
+            - name: ZOOM_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: ZOOM_CLIENT_SECRET
+            - name: ASANA_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: ASANA_CLIENT_ID
+            - name: ASANA_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: ASANA_CLIENT_SECRET
+            - name: LINEAR_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: LINEAR_CLIENT_ID
+            - name: LINEAR_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: LINEAR_CLIENT_SECRET
+            - name: JIRA_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: JIRA_CLIENT_ID
+            - name: JIRA_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: JIRA_CLIENT_SECRET
+            - name: NOTION_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: NOTION_CLIENT_ID
+            - name: NOTION_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: NOTION_CLIENT_SECRET
+
+            # --- CAPTCHA ---
+            - name: CAPTCHA_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: CAPTCHA_ENABLED
+            - name: CAPTCHA_SITE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: CAPTCHA_SITE_KEY
+            - name: CAPTCHA_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: CAPTCHA_SECRET_KEY
+            - name: CAPTCHA_VERIFY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: CAPTCHA_VERIFY_URL
+
+            # --- Stripe ---
+            - name: STRIPE_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: STRIPE_ENABLED
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: STRIPE_SECRET_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: STRIPE_WEBHOOK_SECRET
+
+            # --- SCIM ---
+            - name: SCIM_RATE_LIMIT_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: SCIM_RATE_LIMIT_ENABLED
+            - name: SCIM_RATE_LIMIT_PER_MINUTE
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: SCIM_RATE_LIMIT_PER_MINUTE
+
+            # --- Sandbox ---
+            - name: SANDBOX_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: SANDBOX_ENABLED
+            - name: SANDBOX_PULL_IMAGES
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: SANDBOX_PULL_IMAGES
+
+            # --- Logging ---
+            - name: LOG_LEVEL_APP
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LOG_LEVEL_APP
+            - name: LOG_LEVEL_SECURITY
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LOG_LEVEL_SECURITY
+            - name: LOG_LEVEL_WEB
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LOG_LEVEL_WEB
+            - name: LOG_LEVEL_SQL
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: LOG_LEVEL_SQL
+            - name: AXIOM_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: nodeloom-secrets
+                  key: AXIOM_TOKEN
+            - name: AXIOM_DATASET
+              valueFrom:
+                configMapKeyRef:
+                  name: nodeloom-config
+                  key: AXIOM_DATASET
+
+            # --- Spring ---
             - name: SPRING_PROFILES_ACTIVE
               valueFrom:
                 configMapKeyRef:

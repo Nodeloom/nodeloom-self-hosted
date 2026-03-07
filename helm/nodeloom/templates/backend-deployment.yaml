@@ -28,6 +28,57 @@ spec:
             - containerPort: 8080
               name: http
           env:
+            # --- Security (REQUIRED) ---
+            - name: APP_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: APP_ENCRYPTION_KEY
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: JWT_SECRET
+            - name: ADMIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: APP_ADMIN_API_KEY
+
+            # --- Self-Hosted Mode ---
+            - name: DEPLOYMENT_MODE
+              value: {{ .Values.config.deploymentMode | quote }}
+            - name: LICENSE_VALIDATION_ENABLED
+              value: {{ .Values.config.licenseValidationEnabled | quote }}
+            - name: NODELOOM_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: NODELOOM_LICENSE_KEY
+            - name: LICENSE_VALIDATION_URL
+              value: {{ .Values.config.licenseValidationUrl | quote }}
+            - name: LICENSE_CACHE_TTL_HOURS
+              value: {{ .Values.config.licenseCacheTtlHours | quote }}
+            - name: LICENSE_REVALIDATION_INTERVAL_HOURS
+              value: {{ .Values.config.licenseRevalidationIntervalHours | quote }}
+            - name: LICENSE_GRACE_PERIOD_HOURS
+              value: {{ .Values.config.licenseGracePeriodHours | quote }}
+            - name: LICENSE_VALIDATION_TIMEOUT_SECONDS
+              value: {{ .Values.config.licenseValidationTimeoutSeconds | quote }}
+
+            # --- Initial Admin ---
+            - name: ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: ADMIN_EMAIL
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: ADMIN_PASSWORD
+
+            # --- Database ---
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://{{ include "nodeloom.fullname" . }}-postgres:5432/{{ .Values.postgresql.auth.database }}
             - name: SPRING_DATASOURCE_USERNAME
@@ -37,20 +88,33 @@ spec:
                 secretKeyRef:
                   name: {{ include "nodeloom.fullname" . }}-secrets
                   key: POSTGRES_PASSWORD
-            - name: SPRING_REDIS_HOST
+            - name: HIKARI_MAX_POOL_SIZE
+              value: {{ .Values.config.hikariMaxPoolSize | quote }}
+            - name: HIKARI_MIN_IDLE
+              value: {{ .Values.config.hikariMinIdle | quote }}
+
+            # --- Redis ---
+            - name: SPRING_DATA_REDIS_HOST
               value: {{ include "nodeloom.fullname" . }}-redis
-            - name: SPRING_REDIS_PORT
+            - name: SPRING_DATA_REDIS_PORT
               value: "6379"
-            - name: SPRING_REDIS_PASSWORD
+            - name: SPRING_DATA_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "nodeloom.fullname" . }}-secrets
                   key: REDIS_PASSWORD
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "nodeloom.fullname" . }}-secrets
-                  key: JWT_SECRET
+
+            # --- Application URLs ---
+            - name: APP_BASE_URL
+              value: {{ .Values.config.appBaseUrl | quote }}
+            - name: APP_FRONTEND_URL
+              value: {{ .Values.config.appFrontendUrl | quote }}
+            - name: APP_CORS_ALLOWED_ORIGINS
+              value: {{ .Values.config.corsAllowedOrigins | quote }}
+            - name: FORWARD_HEADERS_STRATEGY
+              value: {{ .Values.config.forwardHeadersStrategy | quote }}
+
+            # --- AI Providers ---
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -61,6 +125,206 @@ spec:
                 secretKeyRef:
                   name: {{ include "nodeloom.fullname" . }}-secrets
                   key: ANTHROPIC_API_KEY
+            - name: GOOGLE_AI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: GOOGLE_AI_API_KEY
+            - name: AZURE_OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: AZURE_OPENAI_API_KEY
+            - name: AZURE_OPENAI_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: AZURE_OPENAI_ENDPOINT
+
+            # --- OAuth Providers ---
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: GOOGLE_CLIENT_ID
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: GOOGLE_CLIENT_SECRET
+            - name: GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: GITHUB_CLIENT_ID
+            - name: GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: GITHUB_CLIENT_SECRET
+            - name: SLACK_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: SLACK_CLIENT_ID
+            - name: SLACK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: SLACK_CLIENT_SECRET
+            - name: MICROSOFT_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: MICROSOFT_CLIENT_ID
+            - name: MICROSOFT_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: MICROSOFT_CLIENT_SECRET
+            - name: SALESFORCE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: SALESFORCE_CLIENT_ID
+            - name: SALESFORCE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: SALESFORCE_CLIENT_SECRET
+            - name: HUBSPOT_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: HUBSPOT_CLIENT_ID
+            - name: HUBSPOT_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: HUBSPOT_CLIENT_SECRET
+            - name: SHOPIFY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: SHOPIFY_CLIENT_ID
+            - name: SHOPIFY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: SHOPIFY_CLIENT_SECRET
+            - name: ZOOM_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: ZOOM_CLIENT_ID
+            - name: ZOOM_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: ZOOM_CLIENT_SECRET
+            - name: ASANA_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: ASANA_CLIENT_ID
+            - name: ASANA_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: ASANA_CLIENT_SECRET
+            - name: LINEAR_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: LINEAR_CLIENT_ID
+            - name: LINEAR_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: LINEAR_CLIENT_SECRET
+            - name: JIRA_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: JIRA_CLIENT_ID
+            - name: JIRA_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: JIRA_CLIENT_SECRET
+            - name: NOTION_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: NOTION_CLIENT_ID
+            - name: NOTION_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: NOTION_CLIENT_SECRET
+
+            # --- CAPTCHA ---
+            - name: CAPTCHA_ENABLED
+              value: {{ .Values.config.captchaEnabled | quote }}
+            - name: CAPTCHA_SITE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: CAPTCHA_SITE_KEY
+            - name: CAPTCHA_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: CAPTCHA_SECRET_KEY
+            - name: CAPTCHA_VERIFY_URL
+              value: {{ .Values.config.captchaVerifyUrl | quote }}
+
+            # --- Stripe ---
+            - name: STRIPE_ENABLED
+              value: {{ .Values.config.stripeEnabled | quote }}
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: STRIPE_SECRET_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: STRIPE_WEBHOOK_SECRET
+
+            # --- SCIM ---
+            - name: SCIM_RATE_LIMIT_ENABLED
+              value: {{ .Values.config.scimRateLimitEnabled | quote }}
+            - name: SCIM_RATE_LIMIT_PER_MINUTE
+              value: {{ .Values.config.scimRateLimitPerMinute | quote }}
+
+            # --- Sandbox ---
+            - name: SANDBOX_ENABLED
+              value: {{ .Values.config.sandboxEnabled | quote }}
+            - name: SANDBOX_PULL_IMAGES
+              value: {{ .Values.config.sandboxPullImages | quote }}
+
+            # --- Logging ---
+            - name: LOG_LEVEL_APP
+              value: {{ .Values.config.logLevelApp | quote }}
+            - name: LOG_LEVEL_SECURITY
+              value: {{ .Values.config.logLevelSecurity | quote }}
+            - name: LOG_LEVEL_WEB
+              value: {{ .Values.config.logLevelWeb | quote }}
+            - name: LOG_LEVEL_SQL
+              value: {{ .Values.config.logLevelSql | quote }}
+            - name: AXIOM_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nodeloom.fullname" . }}-secrets
+                  key: AXIOM_TOKEN
+            - name: AXIOM_DATASET
+              value: {{ .Values.config.axiomDataset | quote }}
+
+            # --- Spring ---
+            - name: SERVER_PORT
+              value: "8080"
             - name: SPRING_PROFILES_ACTIVE
               value: production
           resources:

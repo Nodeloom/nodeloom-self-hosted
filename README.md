@@ -16,7 +16,7 @@ Deploy NodeLoom on your own infrastructure. This repository contains deployment 
 
 ```bash
 # Clone this repository
-git clone https://github.com/reedzerrad/nodeloom-self-hosted.git
+git clone https://github.com/Nodeloom/nodeloom-self-hosted.git
 cd nodeloom-self-hosted
 
 # Copy environment template
@@ -154,8 +154,8 @@ Self-hosted NodeLoom has different user management than the SaaS version:
 Official images are published to GitHub Container Registry:
 
 ```
-ghcr.io/reedzerrad/nodeloom-backend:latest
-ghcr.io/reedzerrad/nodeloom-frontend:latest
+ghcr.io/nodeloom/nodeloom-backend:latest
+ghcr.io/nodeloom/nodeloom-frontend:latest
 ```
 
 ### Available Tags
@@ -166,7 +166,7 @@ ghcr.io/reedzerrad/nodeloom-frontend:latest
 ## Support
 
 - **Documentation**: https://docs.nodeloom.io
-- **Issues**: https://github.com/reedzerrad/nodeloom-self-hosted/issues
+- **Issues**: https://github.com/Nodeloom/nodeloom-self-hosted/issues
 - **Email**: support@nodeloom.io
 
 ## License

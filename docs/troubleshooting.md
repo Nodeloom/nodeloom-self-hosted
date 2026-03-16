@@ -304,7 +304,7 @@ docker-compose exec redis redis-cli -a $REDIS_PASSWORD ping
 ## Getting Help
 
 1. **Check logs** - Most issues are visible in logs
-2. **Search existing issues** - https://github.com/reedzerrad/nodeloom-self-hosted/issues
+2. **Search existing issues** - https://github.com/Nodeloom/nodeloom-self-hosted/issues
 3. **Create new issue** - Include logs and configuration (redact secrets)
 4. **Contact support** - support@nodeloom.io
 

@@ -3,7 +3,7 @@
 
 # Global settings
 global:
-  imageRegistry: ghcr.io/reedzerrad
+  imageRegistry: ghcr.io/nodeloom
   imagePullSecrets: []
 
 # Backend configuration

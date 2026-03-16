@@ -32,7 +32,7 @@ This guide covers the complete installation of NodeLoom on your own infrastructu
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/reedzerrad/nodeloom-self-hosted.git
+   git clone https://github.com/Nodeloom/nodeloom-self-hosted.git
    cd nodeloom-self-hosted
    ```
 
@@ -81,7 +81,7 @@ This guide covers the complete installation of NodeLoom on your own infrastructu
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/reedzerrad/nodeloom-self-hosted.git
+   git clone https://github.com/Nodeloom/nodeloom-self-hosted.git
    cd nodeloom-self-hosted
    ```
 
@@ -119,7 +119,7 @@ This guide covers the complete installation of NodeLoom on your own infrastructu
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/reedzerrad/nodeloom-self-hosted.git
+   git clone https://github.com/Nodeloom/nodeloom-self-hosted.git
    cd nodeloom-self-hosted
    ```
 

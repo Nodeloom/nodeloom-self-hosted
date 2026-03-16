@@ -357,7 +357,7 @@ resources:
    ```
 3. **Monitor for vulnerabilities:**
    ```bash
-   docker scan ghcr.io/reedzerrad/nodeloom-backend:latest
+   docker scan ghcr.io/nodeloom/nodeloom-backend:latest
    ```
 
 ## Incident Response

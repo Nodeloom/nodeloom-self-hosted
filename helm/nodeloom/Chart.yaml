@@ -11,7 +11,7 @@ keywords:
   - agents
 home: https://nodeloom.io
 sources:
-  - https://github.com/reedzerrad/nodeloom-self-hosted
+  - https://github.com/Nodeloom/nodeloom-self-hosted
 maintainers:
   - name: NodeLoom
     email: support@nodeloom.io

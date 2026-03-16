@@ -16,7 +16,7 @@ spec:
       serviceAccountName: nodeloom
       containers:
         - name: backend
-          image: ghcr.io/reedzerrad/nodeloom-backend:latest
+          image: ghcr.io/nodeloom/nodeloom-backend:latest
           ports:
             - containerPort: 8080
           env:

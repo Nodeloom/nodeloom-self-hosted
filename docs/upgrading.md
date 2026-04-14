@@ -2,6 +2,19 @@
 
 How to upgrade NodeLoom to a new version.
 
+## Migration Notes
+
+### V109: Anthropic Managed Agents
+
+**Migration:** Automatic (Flyway). Creates the `anthropic_session_monitors` table for tracking Anthropic Managed Agent sessions.
+
+**New features:**
+- Anthropic Managed Agents discovery and session monitoring
+- Configurable Anthropic API base URL (`APP_ANTHROPIC_API_BASE`)
+- Configurable SSRF protection toggle (`APP_SSRF_PROTECTION_ENABLED`)
+
+**Action required:** None. Flyway runs the migration automatically on startup. The new table is created with `IF NOT EXISTS` for safety.
+
 ## Before Upgrading
 
 1. **Read release notes** for breaking changes

@@ -160,6 +160,51 @@ NodeLoom supports 12 OAuth providers for one-click credential connections. Confi
 | `POSTGRES_MEMORY_LIMIT` | `4G` | PostgreSQL container memory limit |
 | `REDIS_MEMORY_LIMIT` | `1G` | Redis container memory limit |
 
+### Agent Discovery
+
+Agent Discovery automatically finds AI agents across your infrastructure through 6 channels:
+
+| Source | What It Discovers | Configuration |
+|--------|-------------------|---------------|
+| SDK Telemetry | Agents instrumented with NodeLoom SDKs | Automatic (no config needed) |
+| AWS Bedrock | Bedrock agents and foundation models | UI: Agent Inventory → Integrations |
+| Azure AI | Azure OpenAI deployments and models | UI: Agent Inventory → Integrations |
+| GCP Vertex AI | Vertex AI endpoints and models | UI: Agent Inventory → Integrations |
+| GitHub | Repositories using AI frameworks | UI: Agent Inventory → Integrations |
+| Anthropic Managed Agents | Managed Agents, models, tools, MCP servers | UI: Agent Inventory → Integrations |
+
+All discovery source credentials are stored encrypted in the database. No environment variables are required.
+
+**Optional:** To override the Anthropic API base URL (e.g., for a proxy):
+
+```bash
+APP_ANTHROPIC_API_BASE=https://api.anthropic.com  # default
+```
+
+Agent risk scores are auto-calculated hourly and on every agent registration/update.
+
+### SIEM Export
+
+Export audit logs to external SIEM systems. Configured through the UI at **Audit → SIEM Export**.
+
+Supported targets:
+- **Splunk** (HEC endpoint)
+- **Datadog** (Logs API)
+- **Elasticsearch** (Bulk API)
+- **Custom Webhook** (any HTTP endpoint)
+
+No environment variables are required — all configuration (URLs, tokens, auth) is stored encrypted in the database.
+
+### SSRF Protection
+
+SSRF (Server-Side Request Forgery) protection validates outbound HTTP requests to block private, loopback, and cloud metadata IP addresses. Enabled by default.
+
+```bash
+APP_SSRF_PROTECTION_ENABLED=true  # default; set to false only for local development
+```
+
+**Do not disable in production.** This protects against attacks targeting internal services via SIEM export URLs, webhook endpoints, and OAuth callbacks.
+
 ## Kubernetes Configuration
 
 ### Resource Limits

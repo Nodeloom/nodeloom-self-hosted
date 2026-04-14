@@ -305,6 +305,29 @@ View logs in the Audit section of the UI.
 - Rate limiting enabled by default
 - Widget endpoints rate limited separately (30 req/min per IP)
 
+## SSRF Protection
+
+NodeLoom validates all outbound HTTP requests (SIEM exports, webhooks, OAuth callbacks) against a blocklist of private and internal IP ranges:
+
+- Loopback (127.0.0.0/8, ::1)
+- Private networks (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+- Link-local / cloud metadata (169.254.0.0/16)
+- IPv4-mapped IPv6 addresses
+
+Controlled via `APP_SSRF_PROTECTION_ENABLED=true` (default). Do not disable in production.
+
+## CAPTCHA (Bot Protection)
+
+Registration can be protected with Cloudflare Turnstile CAPTCHA:
+
+```bash
+CAPTCHA_ENABLED=true
+CAPTCHA_SITE_KEY=your-turnstile-site-key
+CAPTCHA_SECRET_KEY=your-turnstile-secret-key
+```
+
+The frontend dynamically loads the Turnstile widget when enabled. No frontend configuration needed.
+
 ## Container Security
 
 ### Run as Non-Root

@@ -32,7 +32,7 @@ frontend:
   replicaCount: 2
   image:
     repository: nodeloom-frontend
-    tag: latest
+    tag: self-hosted
     pullPolicy: IfNotPresent
   resources:
     requests:

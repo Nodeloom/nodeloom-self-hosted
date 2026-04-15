@@ -66,7 +66,7 @@ services:
       DEPLOYMENT_MODE: SELF_HOSTED
       LICENSE_VALIDATION_ENABLED: "true"
       NODELOOM_LICENSE_KEY: ${NODELOOM_LICENSE_KEY:?NODELOOM_LICENSE_KEY is required}
-      LICENSE_VALIDATION_URL: ${LICENSE_VALIDATION_URL:-https://license.nodeloom.io/api/licenses/validate}
+      LICENSE_VALIDATION_URL: ${LICENSE_VALIDATION_URL:-https://backoffice.nodeloom.io/api/licenses/validate}
       LICENSE_CACHE_TTL_HOURS: ${LICENSE_CACHE_TTL_HOURS:-24}
       LICENSE_REVALIDATION_INTERVAL_HOURS: ${LICENSE_REVALIDATION_INTERVAL_HOURS:-6}
       LICENSE_GRACE_PERIOD_HOURS: ${LICENSE_GRACE_PERIOD_HOURS:-72}
@@ -192,6 +192,11 @@ services:
       LOG_LEVEL_SQL: ${LOG_LEVEL_SQL:-WARN}
       AXIOM_TOKEN: ${AXIOM_TOKEN:-}
       AXIOM_DATASET: ${AXIOM_DATASET:-nodeloom-production}
+
+      # ===========================================
+      # Cookie Security (set to false for HTTP, true for HTTPS)
+      # ===========================================
+      APP_COOKIE_SECURE: ${APP_COOKIE_SECURE:-true}
 
       # ===========================================
       # Spring

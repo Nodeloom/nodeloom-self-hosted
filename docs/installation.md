@@ -83,19 +83,22 @@ This guide covers the complete installation of NodeLoom on your own infrastructu
 
 6. **Start services:**
    ```bash
-   docker-compose up -d
+   docker-compose --profile with-nginx up -d
    ```
+   This starts PostgreSQL, Redis, the backend, frontend, and an nginx reverse proxy. The nginx proxy serves both the frontend and API on a single origin (port 80), which is required for the browser's security policies to work correctly.
+
+   > **Note:** If port 80 is already in use, you can change it in `docker-compose.yml` under the nginx service ports.
 
 7. **Verify installation:**
    ```bash
    # Check all containers are running
-   docker-compose ps
+   docker-compose --profile with-nginx ps
 
    # Check backend health
-   curl http://localhost:8080/actuator/health
+   curl http://localhost/actuator/health
 
    # Access the application
-   open http://localhost:3000
+   open http://localhost
    ```
 
 ### Method 2: Kubernetes (Recommended for Production)

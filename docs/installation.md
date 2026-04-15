@@ -60,12 +60,33 @@ This guide covers the complete installation of NodeLoom on your own infrastructu
    ANTHROPIC_API_KEY=sk-ant-...
    ```
 
-5. **Start services:**
+5. **Authenticate to the Docker registry:**
+   NodeLoom images are hosted on GitHub Container Registry. Authenticate using your license key:
+   ```bash
+   curl -s https://backoffice.nodeloom.io/api/registry/auth \
+     -H "Content-Type: application/json" \
+     -d "{\"licenseKey\":\"$NODELOOM_LICENSE_KEY\"}" | \
+     jq -r .token | docker login ghcr.io -u nodeloom --password-stdin
+   ```
+   This uses your license key to obtain a registry token. The token is cached locally by Docker — you only need to do this once per machine (or after the token expires).
+
+   > **Note:** If you don't have `jq` installed, you can extract the token manually:
+   > ```bash
+   > curl -s https://backoffice.nodeloom.io/api/registry/auth \
+   >   -H "Content-Type: application/json" \
+   >   -d '{"licenseKey":"NL-XXXXX-XXXXX-XXXXX-XXXXX"}'
+   > ```
+   > Copy the `token` value from the response and run:
+   > ```bash
+   > docker login ghcr.io -u nodeloom -p <token>
+   > ```
+
+6. **Start services:**
    ```bash
    docker-compose up -d
    ```
 
-6. **Verify installation:**
+7. **Verify installation:**
    ```bash
    # Check all containers are running
    docker-compose ps

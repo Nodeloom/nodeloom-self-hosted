@@ -55,7 +55,7 @@ data:
   AXIOM_DATASET: "nodeloom-production"
 
   # License settings
-  LICENSE_VALIDATION_URL: "https://license.nodeloom.io/api/licenses/validate"
+  LICENSE_VALIDATION_URL: "https://backoffice.nodeloom.io/api/licenses/validate"
   LICENSE_CACHE_TTL_HOURS: "24"
   LICENSE_REVALIDATION_INTERVAL_HOURS: "6"
   LICENSE_GRACE_PERIOD_HOURS: "72"

@@ -175,7 +175,7 @@ config:
   # Self-hosted mode
   deploymentMode: "SELF_HOSTED"
   licenseValidationEnabled: "true"
-  licenseValidationUrl: "https://license.nodeloom.io/api/licenses/validate"
+  licenseValidationUrl: "https://backoffice.nodeloom.io/api/licenses/validate"
   licenseCacheTtlHours: "24"
   licenseRevalidationIntervalHours: "6"
   licenseGracePeriodHours: "72"

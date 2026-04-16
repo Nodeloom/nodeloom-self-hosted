@@ -154,8 +154,8 @@ Self-hosted NodeLoom has different user management than the SaaS version:
 Official self-hosted images are published to GitHub Container Registry:
 
 ```
-ghcr.io/nodeloom/nodeloom-backend:self-hosted
-ghcr.io/nodeloom/nodeloom-frontend:self-hosted
+ghcr.io/nodeloom/nodeloom-backend-selfhosted:latest
+ghcr.io/nodeloom/nodeloom-frontend-selfhosted:latest
 ```
 
 The `self-hosted` images include hardened license enforcement:
@@ -164,7 +164,7 @@ The `self-hosted` images include hardened license enforcement:
 - Cache and grace period durations are capped to prevent abuse
 
 ### Available Tags
-- `self-hosted` - Latest self-hosted release (recommended)
+- `latest` - Most recent stable release (recommended)
 - `x.y.z` - Specific version (e.g., `1.0.0`)
 
 ## Support

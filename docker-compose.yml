@@ -51,7 +51,7 @@ services:
           memory: 256M
 
   backend:
-    image: ghcr.io/nodeloom/nodeloom-backend:${NODELOOM_VERSION:-self-hosted}
+    image: ghcr.io/nodeloom/nodeloom-backend-selfhosted:${NODELOOM_VERSION:-latest}
     container_name: nodeloom-backend
     restart: unless-stopped
     depends_on:
@@ -221,7 +221,7 @@ services:
           memory: 1G
 
   frontend:
-    image: ghcr.io/nodeloom/nodeloom-frontend:${NODELOOM_FRONTEND_TAG:-self-hosted}
+    image: ghcr.io/nodeloom/nodeloom-frontend-selfhosted:${NODELOOM_FRONTEND_TAG:-latest}
     container_name: nodeloom-frontend
     restart: unless-stopped
     depends_on:

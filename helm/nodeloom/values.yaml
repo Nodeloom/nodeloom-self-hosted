@@ -10,8 +10,8 @@ global:
 backend:
   replicaCount: 2
   image:
-    repository: nodeloom-backend
-    tag: self-hosted
+    repository: nodeloom-backend-selfhosted
+    tag: latest
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -31,8 +31,8 @@ backend:
 frontend:
   replicaCount: 2
   image:
-    repository: nodeloom-frontend
-    tag: self-hosted
+    repository: nodeloom-frontend-selfhosted
+    tag: latest
     pullPolicy: IfNotPresent
   resources:
     requests:

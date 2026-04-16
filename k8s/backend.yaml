@@ -16,7 +16,7 @@ spec:
       serviceAccountName: nodeloom
       containers:
         - name: backend
-          image: ghcr.io/nodeloom/nodeloom-backend:latest
+          image: ghcr.io/nodeloom/nodeloom-backend:self-hosted
           ports:
             - containerPort: 8080
           env:

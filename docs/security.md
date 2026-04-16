@@ -380,7 +380,7 @@ resources:
    ```
 3. **Monitor for vulnerabilities:**
    ```bash
-   docker scan ghcr.io/nodeloom/nodeloom-backend:self-hosted
+   docker scan ghcr.io/nodeloom/nodeloom-backend-selfhosted:latest
    ```
 
 ## Incident Response

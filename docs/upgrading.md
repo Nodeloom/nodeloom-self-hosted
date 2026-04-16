@@ -88,8 +88,8 @@ PG_POD=$(kubectl get pods -n nodeloom -l app=postgres -o jsonpath='{.items[0].me
 kubectl exec -n nodeloom $PG_POD -- pg_dump -U nodeloom nodeloom > backup.sql
 
 # 2. Update image tags in manifests
-sed -i 's/nodeloom-backend:1.1.0/nodeloom-backend:1.2.0/g' k8s/backend.yaml
-sed -i 's/nodeloom-frontend:1.1.0/nodeloom-frontend:1.2.0/g' k8s/frontend.yaml
+sed -i 's/nodeloom-backend-selfhosted:1.1.0/nodeloom-backend-selfhosted:1.2.0/g' k8s/backend.yaml
+sed -i 's/nodeloom-frontend-selfhosted:1.1.0/nodeloom-frontend-selfhosted:1.2.0/g' k8s/frontend.yaml
 
 # 3. Apply updates
 kubectl apply -f k8s/backend.yaml

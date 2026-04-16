@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/nodeloom/nodeloom-frontend:self-hosted
+          image: ghcr.io/nodeloom/nodeloom-frontend-selfhosted:latest
           ports:
             - containerPort: 3000
           env:

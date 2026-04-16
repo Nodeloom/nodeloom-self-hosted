@@ -222,7 +222,7 @@ services:
           memory: 1G
 
   frontend:
-    image: ghcr.io/nodeloom/nodeloom-frontend-selfhosted:${NODELOOM_FRONTEND_TAG:-latest}
+    image: ghcr.io/nodeloom/nodeloom-frontend-selfhosted:${NODELOOM_VERSION:-latest}
     container_name: nodeloom-frontend
     restart: unless-stopped
     depends_on:

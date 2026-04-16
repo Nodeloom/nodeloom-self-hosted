@@ -95,17 +95,12 @@ while true; do
         write_status "RESTARTING" "Restarting services with version ${TARGET_VERSION}"
 
         # Update .env with new version
+        # Update .env with new version (both backend and frontend use NODELOOM_VERSION)
         if [ -f "${ENV_FILE}" ]; then
             if grep -q '^NODELOOM_VERSION=' "${ENV_FILE}"; then
                 sed -i "s/^NODELOOM_VERSION=.*/NODELOOM_VERSION=${TARGET_VERSION}/" "${ENV_FILE}"
             else
                 echo "NODELOOM_VERSION=${TARGET_VERSION}" >> "${ENV_FILE}"
-            fi
-
-            if grep -q '^NODELOOM_FRONTEND_TAG=' "${ENV_FILE}"; then
-                sed -i "s/^NODELOOM_FRONTEND_TAG=.*/NODELOOM_FRONTEND_TAG=${TARGET_VERSION}/" "${ENV_FILE}"
-            else
-                echo "NODELOOM_FRONTEND_TAG=${TARGET_VERSION}" >> "${ENV_FILE}"
             fi
         fi
 

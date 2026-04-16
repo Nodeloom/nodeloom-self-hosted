@@ -55,16 +55,8 @@ spec:
                 secretKeyRef:
                   name: {{ include "nodeloom.fullname" . }}-secrets
                   key: NODELOOM_LICENSE_KEY
-            - name: LICENSE_VALIDATION_URL
-              value: {{ .Values.config.licenseValidationUrl | quote }}
-            - name: LICENSE_CACHE_TTL_HOURS
-              value: {{ .Values.config.licenseCacheTtlHours | quote }}
-            - name: LICENSE_REVALIDATION_INTERVAL_HOURS
-              value: {{ .Values.config.licenseRevalidationIntervalHours | quote }}
-            - name: LICENSE_GRACE_PERIOD_HOURS
-              value: {{ .Values.config.licenseGracePeriodHours | quote }}
-            - name: LICENSE_VALIDATION_TIMEOUT_SECONDS
-              value: {{ .Values.config.licenseValidationTimeoutSeconds | quote }}
+            # License validation URL, cache TTL, grace period, and signature
+            # verification are hardcoded in the self-hosted backend image.
 
             # --- Initial Admin ---
             - name: ADMIN_EMAIL

@@ -53,31 +53,8 @@ spec:
                 secretKeyRef:
                   name: nodeloom-secrets
                   key: NODELOOM_LICENSE_KEY
-            - name: LICENSE_VALIDATION_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: nodeloom-config
-                  key: LICENSE_VALIDATION_URL
-            - name: LICENSE_CACHE_TTL_HOURS
-              valueFrom:
-                configMapKeyRef:
-                  name: nodeloom-config
-                  key: LICENSE_CACHE_TTL_HOURS
-            - name: LICENSE_GRACE_PERIOD_HOURS
-              valueFrom:
-                configMapKeyRef:
-                  name: nodeloom-config
-                  key: LICENSE_GRACE_PERIOD_HOURS
-            - name: LICENSE_REVALIDATION_INTERVAL_HOURS
-              valueFrom:
-                configMapKeyRef:
-                  name: nodeloom-config
-                  key: LICENSE_REVALIDATION_INTERVAL_HOURS
-            - name: LICENSE_VALIDATION_TIMEOUT_SECONDS
-              valueFrom:
-                configMapKeyRef:
-                  name: nodeloom-config
-                  key: LICENSE_VALIDATION_TIMEOUT_SECONDS
+            # License validation URL, cache TTL, grace period, and signature
+            # verification are hardcoded in the self-hosted backend image.
 
             # --- Initial Admin ---
             - name: ADMIN_EMAIL

@@ -129,13 +129,10 @@ NodeLoom supports 12 OAuth providers for one-click credential connections. Confi
 
 ### License Settings (Advanced)
 
+The license validation URL and cryptographic signature verification are hardcoded in the self-hosted backend image. Cache TTL and grace period are capped by the binary to prevent bypass.
+
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LICENSE_VALIDATION_URL` | NodeLoom server | License validation endpoint |
-| `LICENSE_CACHE_TTL_HOURS` | `24` | How long to cache license validation results |
-| `LICENSE_REVALIDATION_INTERVAL_HOURS` | `6` | How often to re-validate the license |
-| `LICENSE_GRACE_PERIOD_HOURS` | `72` | Offline grace period before license enforcement |
-| `LICENSE_VALIDATION_TIMEOUT_SECONDS` | `30` | Timeout for license validation requests |
 | `MACHINE_ID` | auto-generated | Machine identifier for license binding |
 
 ### Logging Configuration

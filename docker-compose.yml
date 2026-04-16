@@ -51,7 +51,7 @@ services:
           memory: 256M
 
   backend:
-    image: ghcr.io/nodeloom/nodeloom-backend:${NODELOOM_VERSION:-latest}
+    image: ghcr.io/nodeloom/nodeloom-backend:${NODELOOM_VERSION:-self-hosted}
     container_name: nodeloom-backend
     restart: unless-stopped
     depends_on:
@@ -66,11 +66,8 @@ services:
       DEPLOYMENT_MODE: SELF_HOSTED
       LICENSE_VALIDATION_ENABLED: "true"
       NODELOOM_LICENSE_KEY: ${NODELOOM_LICENSE_KEY:?NODELOOM_LICENSE_KEY is required}
-      LICENSE_VALIDATION_URL: ${LICENSE_VALIDATION_URL:-https://backoffice.nodeloom.io/api/licenses/validate}
-      LICENSE_CACHE_TTL_HOURS: ${LICENSE_CACHE_TTL_HOURS:-24}
-      LICENSE_REVALIDATION_INTERVAL_HOURS: ${LICENSE_REVALIDATION_INTERVAL_HOURS:-6}
-      LICENSE_GRACE_PERIOD_HOURS: ${LICENSE_GRACE_PERIOD_HOURS:-72}
-      LICENSE_VALIDATION_TIMEOUT_SECONDS: ${LICENSE_VALIDATION_TIMEOUT_SECONDS:-30}
+      # License validation URL is hardcoded in the self-hosted backend image
+      # and cannot be overridden. Cache TTL and grace period are capped by the binary.
       MACHINE_ID: ${MACHINE_ID:-}
 
       # ===========================================

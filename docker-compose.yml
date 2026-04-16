@@ -205,6 +205,7 @@ services:
     volumes:
       - ./data/files:/tmp/nodeloom-files
       - /var/run/docker.sock:/var/run/docker.sock:ro  # For sandbox execution
+      - update_data:/app/updates  # Shared with updater sidecar
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
@@ -244,6 +245,26 @@ services:
         reservations:
           memory: 256M
 
+  # Updater sidecar — handles pulling new images and restarting containers
+  # Communicates with the backend via shared volume (no network API)
+  updater:
+    image: ghcr.io/nodeloom/nodeloom-updater:latest
+    container_name: nodeloom-updater
+    restart: unless-stopped
+    volumes:
+      - update_data:/updates
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./.env:/compose/.env
+      - ./docker-compose.yml:/compose/docker-compose.yml:ro
+    networks:
+      - nodeloom-network
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+        reservations:
+          memory: 32M
+
   # Optional: Nginx reverse proxy with SSL
   nginx:
     image: nginx:alpine
@@ -268,6 +289,8 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  update_data:
     driver: local
 
 networks:

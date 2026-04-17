@@ -51,7 +51,8 @@ services:
           memory: 256M
 
   backend:
-    image: ghcr.io/nodeloom/nodeloom-backend-selfhosted:${NODELOOM_VERSION:-latest}
+    image: ghcr.io/nodeloom/nodeloom-backend:${NODELOOM_VERSION:-latest}
+    platform: linux/amd64
     container_name: nodeloom-backend
     restart: unless-stopped
     depends_on:
@@ -66,6 +67,7 @@ services:
       DEPLOYMENT_MODE: SELF_HOSTED
       LICENSE_VALIDATION_ENABLED: "true"
       NODELOOM_LICENSE_KEY: ${NODELOOM_LICENSE_KEY:?NODELOOM_LICENSE_KEY is required}
+      LICENSE_SIGNING_PUBLIC_KEY: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3xJ3LjiPMujZ7UHU/hjxrwTykEz3y3KIixpNLjDwjoYfdK2z9NVvDts0qYwfPODT+2/GKSGUS3FgMn0X5T59toNXgoMuc+TxPXkl9BU6FD7pHHu5iydgYGL8VWlDnkPTmSjjmzH3ocFpljD/sjcapoV14PnZSQ2fDbXSsMQ6/WHxmlTE8PIGZeflglgYHXo1zEXbteTCSB6XqoajXpbvLCNBo+iAUm74kgwZhFW9L/hz8dO5YlmDV9JJA3WJmo1qqVy71VXd1b4cfwbApxmS91J6d3I0PiRG4eLrTRL1vUKTL1HrtDgRQPHlL3PiKWWnu2IOyMlgQK93z8Vy9XeAiQIDAQAB"
       # License validation URL is hardcoded in the self-hosted backend image
       # and cannot be overridden. Cache TTL and grace period are capped by the binary.
       MACHINE_ID: ${MACHINE_ID:-}
@@ -222,7 +224,8 @@ services:
           memory: 1G
 
   frontend:
-    image: ghcr.io/nodeloom/nodeloom-frontend-selfhosted:${NODELOOM_VERSION:-latest}
+    image: ghcr.io/nodeloom/nodeloom-frontend:${NODELOOM_VERSION:-latest}
+    platform: linux/amd64
     container_name: nodeloom-frontend
     restart: unless-stopped
     depends_on:
